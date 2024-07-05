@@ -1,0 +1,35 @@
+.Home_wrap {
+  width: 500px;
+  height: 100vh;
+  background-color:white;
+  margin: 0 auto;
+  padding: 10px;
+  color: #333;
+}
+
+.header_wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.Home_wrap .logout_btn {
+  width: auto;
+  height: auto;
+
+  font-size: 8px;
+  color: #333;
+  background-color: transparent;
+  border-bottom: 1px solid transparent;
+}
+.Home_wrap .logout_btn:hover {
+  border-bottom: 1px solid #333;
+}
+
+.site_wrap {
+  width: 100%;
+}
