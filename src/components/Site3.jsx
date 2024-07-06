@@ -49,7 +49,7 @@ const mergeWeekData = (data) => {
     collectTemp.push(mergeArr)
   }
   // console.log('collectTemp', collectTemp)
-  return collectTemp;
+  return collectTemp.slice(0, 6);
 }
 
 
@@ -62,10 +62,7 @@ export default function Site3({ data, date }) {
     setWeekTempArr(arr)
   }, [data])
   // console.log('weekTempArr', weekTempArr)
-  console.log()
-
   
-  const arr = [1, 2, 3];
   return (
     <>
       <div className="site3">

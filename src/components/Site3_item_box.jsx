@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect, useState } from "react"
 
 const days = [
@@ -15,13 +16,13 @@ export default function Site3_item_box({ tempArr, idx }) {
     if (day > 6) {
       day = dayNumber + num - 7;
     }
-    if (num > 7) {
-      num = 1;
+    if (num >= 7) {
+      num = 0;
     }
     setDay(days[day]);
     num++;
   }, [idx])
-  console.log('day', day)
+  // console.log('day', day)
 
   return (
     <>

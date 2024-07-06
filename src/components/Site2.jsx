@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect, useState } from "react";
 import Site2_item_box from "./Site2_item_box";
 import './site.css'

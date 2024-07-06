@@ -11,6 +11,7 @@ import GetSecond_weatherState_API from '../functions/second_weatherState_api'
 import GetThird_temperature_API from '../functions/third_temperature_api'
 import GetSecondAPI from '../functions/second_api'
 import GetFirstAPI from '../functions/first_api'
+import GetForth_airCondition_API from '../functions/forth_airCondition_api'
 sessionStorage.clear()
 // Date
 const getCurrentTime = () => {
@@ -23,86 +24,12 @@ const currentDate = new Date().toISOString().slice(0,10).replaceAll('-', '');
 // API
 const API_KEY = 'dviGmZuftX3h7VNSS2UVxZ1M7AfjXEQRTTQVoMhes28TPZETMMXENDJ%2FT60N5MkIHuZGTVGLZqYBfbZTwGUPUw%3D%3D'
 
-// function getFirstAPI() { // 1시간 마다
-//   const currentTime = getCurrentTime();
-//   return new Promise((resolve, reject) => {
-//     var xhr1 = new XMLHttpRequest();
-//     var url1 = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst'; 
-//     /* URL */
-//     var queryParams = '?' + encodeURIComponent('serviceKey') + '=' + `${API_KEY}`; 
-//     /* Service Key */
-//     queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1');
-//     queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('1000');
-//     queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('JSON');
-//     queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent(currentDate);
-//     queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent(`${currentTime - 100}`); // 현재시간 예보 포함하려면 1시간 전 시각으로 시간 대입
-//     queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent('56');
-//     queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent('129');
-
-//     xhr1.open('GET', url1 + queryParams, true);  // 비동기 요청을 위해 true로 설정
-
-//     xhr1.onreadystatechange = function () { //send() 이후 작동
-//       if (this.readyState == 4) {
-//         if (this.status == 200) {
-//           // 요청이 성공했을 때 응답 처리
-//           console.log('Status: 1', this.status);
-//           // console.log('Headers:', this.getAllResponseHeaders());
-//           // console.log('Body:', this.responseText);
-//           sessionStorage.setItem('res1', this.responseText)
-//           return resolve(this.responseText);
-//         } else {
-//           // 요청이 실패했을 때 오류 처리
-//           console.error('Request failed. Status:', this.status);
-//           console.error('Response:', this.responseText);
-//           return reject(0);
-//         }
-//       }
-//     }
-//     xhr1.send(); // Http 전송 역할
-//   })
-// }
-// const getSecondAPI = () => { // 3시간 마다
-//   return new Promise((resolev, reject) => {
-//     var xhr2 = new XMLHttpRequest();
-//     var url2 = 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst'; 
-//     /* URL */
-//     var queryParams = '?' + encodeURIComponent('serviceKey') + '=' + `${API_KEY()}`; 
-//     /* Service Key */
-//     queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1');
-//     queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10000');
-//     queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('JSON');
-//     queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent(`${currentDate}`);
-//     queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent('0200');
-//     queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent('56');
-//     queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent('129');
-  
-//     xhr2.open('GET', url2 + queryParams, true);  // 비동기 요청을 위해 true로 설정
-  
-//     xhr2.onreadystatechange = function () { //send() 이후 작동
-//       if (this.readyState == 4) {
-//         if (this.status == 200) {
-//           // 요청이 성공했을 때 응답 처리
-//           console.log('Status: 2', this.status);
-//           // console.log('Headers:', this.getAllResponseHeaders());
-//           // console.log('Body:', this.responseText);
-//           sessionStorage.setItem('res2', this.responseText);
-//           resolev(this.responseText);
-//         } else {
-//           // 요청이 실패했을 때 오류 처리
-//           console.error('Request failed. Status:', this.status);
-//           console.error('Response:', this.responseText);
-//           reject(0);
-//         }
-//       }
-//     }
-//     xhr2.send(); // Http 전송 역할
-//   })
-// }
 const dailyWeather_API = GetFirstAPI(API_KEY, currentDate, getCurrentTime)
 const dailyHoursTemperature_API = GetSecondAPI(API_KEY, currentDate)
 const dailyWeatherState_API = GetSecond_weatherState_API(API_KEY, currentDate)
 const weeklyTemperature_API = GetThird_temperature_API(API_KEY, currentDate)
-
+const airCondition_API = GetForth_airCondition_API(API_KEY)
+// const airCondition_API = 
 // 코드 모음
 const ultraSrtFcstCategory = [ // 초단기예보
   {category: 'T1H',	value: '기온'}, //	℃	10
@@ -191,7 +118,9 @@ const PTYCode = [ // 단기 강수형태 코드
   {category: '눈', value: 3},
   {category: '소나기', value: 4},
 ]
-const vilageUpdateTime = ['0200', '0500', '0800', '1100', '1400', '1700', '2000', '2300'];
+const vilageUpdateTime = [
+  '0200', '0500', '0800', '1100', '1400', '1700', '2000', '2300'
+];
 
 // 계산 함수
 const getLocal = (x, y) => {
@@ -278,8 +207,6 @@ const findPreviousUpdateTime = (arr, currentTime) => {
   }
   return previousTime;
 };
-let dailyData = [];
-let weeklyData = [];
 
 
 function Home() {
@@ -290,6 +217,11 @@ function Home() {
     threeDaysLater: [],
   });
   const [dailyState, setDailyState] = useState();
+  const [airCondition, setAirCondition] = useState([
+      {PM10: ''},
+      {PM25: ''},
+      {O3: ''}
+    ])
 
   const [mainSec, setMainSec] = useState({
     local: '',
@@ -304,7 +236,8 @@ function Home() {
   const [timeSessionData, setTimeSessionData] = useState([]);
   const [updateTime, setUpdateTime] = useState('');
 
-  useEffect(() => { // 데이터 받음
+  // 데이터 추출
+  useEffect(() => {
     let res1;
     let res2;
     dailyWeather_API //1
@@ -346,11 +279,21 @@ function Home() {
         })
         return;
       })
-
+    airCondition_API
+      .then((resolve) => { //5
+        let data = JSON.parse(resolve).response.body.items;
+        setAirCondition([
+          {PM10: data[0].informGrade},
+          {PM25: data[1].informGrade},
+          {O3: data[2].informGrade},
+        ])
+        return;
+      })
     setCurrentTime(getCurrentTime);
     const previousUpdateTime = findPreviousUpdateTime(vilageUpdateTime, currentTime);
     setUpdateTime(previousUpdateTime)
   }, [])
+  // console.log('airCondition', airCondition)
 
 
   // 데이터 분류
@@ -420,7 +363,7 @@ function Home() {
             <Site1 data={mainSec} />
             <Site2 data={timeSessionData} time={mainSec.baseTime} />
             <Site3 data={weeklyData} date={currentDate} />
-            <Site4 />
+            <Site4 data={airCondition} />
           </div>
         </div>
       </div>
