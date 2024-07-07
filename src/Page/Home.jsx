@@ -11,8 +11,11 @@ import GetSecond_weatherState_API from '../functions/second_weatherState_api'
 import GetThird_temperature_API from '../functions/third_temperature_api'
 import GetSecondAPI from '../functions/second_api'
 import GetFirstAPI from '../functions/first_api'
-import GetForth_airCondition_API from '../functions/forth_airCondition_api'
+import GetForth_airConditionValue_API from '../functions/forth_airConditionValue_api'
+import GetXY_Position_API from '../functions/forth_xyPosition_API'
+import GetStaionName_API from '../functions/forth_stationName'
 sessionStorage.clear()
+
 // Date
 const getCurrentTime = () => {
   const getCurrentTime = new Date().getHours() + '00';
@@ -24,12 +27,11 @@ const currentDate = new Date().toISOString().slice(0,10).replaceAll('-', '');
 // API
 const API_KEY = 'dviGmZuftX3h7VNSS2UVxZ1M7AfjXEQRTTQVoMhes28TPZETMMXENDJ%2FT60N5MkIHuZGTVGLZqYBfbZTwGUPUw%3D%3D'
 
-const dailyWeather_API = GetFirstAPI(API_KEY, currentDate, getCurrentTime)
-const dailyHoursTemperature_API = GetSecondAPI(API_KEY, currentDate)
-const dailyWeatherState_API = GetSecond_weatherState_API(API_KEY, currentDate)
-const weeklyTemperature_API = GetThird_temperature_API(API_KEY, currentDate)
-const airCondition_API = GetForth_airCondition_API(API_KEY)
-// const airCondition_API = 
+const dailyWeather_API = GetFirstAPI(API_KEY, currentDate, getCurrentTime);
+const dailyHoursTemperature_API = GetSecondAPI(API_KEY, currentDate);
+const dailyWeatherState_API = GetSecond_weatherState_API(API_KEY, currentDate);
+const weeklyTemperature_API = GetThird_temperature_API(API_KEY, currentDate);
+
 // 코드 모음
 const ultraSrtFcstCategory = [ // 초단기예보
   {category: 'T1H',	value: '기온'}, //	℃	10
@@ -123,17 +125,19 @@ const vilageUpdateTime = [
 ];
 
 // 계산 함수
-const getLocal = (x, y) => {
-  let local
-  localData.forEach((value) => {
+const getLocal = (x, y) => { // 주소 선택
+  let i  = 0;
+  let local = []
+  localData.forEach((value) => { // "덕양구 주교동"
     if (value.nx != x) return;
     if (value.ny == y) {
       // console.log(value.local)
-      local = value.local;
-      return local;
+      local[i] = value.local;
+      // console.log('local', local)
+      i++
     }
   })
-  return local;
+  return local[7];
 }
 const getTemp = (data) => {
   let temperature;
@@ -217,11 +221,7 @@ function Home() {
     threeDaysLater: [],
   });
   const [dailyState, setDailyState] = useState();
-  const [airCondition, setAirCondition] = useState([
-      {PM10: ''},
-      {PM25: ''},
-      {O3: ''}
-    ])
+  const [airCondition, setAirCondition] = useState([])
 
   const [mainSec, setMainSec] = useState({
     local: '',
@@ -243,7 +243,6 @@ function Home() {
     dailyWeather_API //1
       .then((resolve) => {
         res1 = JSON.parse(resolve).response.body.items.item;
-
         res1.map(value => { // 번역
           ultraSrtFcstCategory.forEach(e => {
             if (e.category == value.category) {
@@ -279,22 +278,12 @@ function Home() {
         })
         return;
       })
-    airCondition_API
-      .then((resolve) => { //5
-        let data = JSON.parse(resolve).response.body.items;
-        setAirCondition([
-          {PM10: data[0].informGrade},
-          {PM25: data[1].informGrade},
-          {O3: data[2].informGrade},
-        ])
-        return;
-      })
+
     setCurrentTime(getCurrentTime);
     const previousUpdateTime = findPreviousUpdateTime(vilageUpdateTime, currentTime);
     setUpdateTime(previousUpdateTime)
   }, [])
-  // console.log('airCondition', airCondition)
-
+  // console.log('airCondition', !airCondition[0].PM10)
 
   // 데이터 분류
   useEffect(() => { 
@@ -316,6 +305,29 @@ function Home() {
       baseTime: currentTime,
     })
   }, [filteredData])
+
+  useEffect(() => {
+    if (!mainSec.local) return;
+    GetXY_Position_API(API_KEY, mainSec.local.replace(/\d/g, ''))
+      .then((res) => { // tmX, tmY 좌표 계산
+        // console.log(0, res)
+        let data = JSON.parse(res).response.body.items; 
+        // [{sggName: '고양시 일산서구', umdName: '덕이동', tmX: '177349.530865', tmY: '465945.611074', sidoName: '경기도'}]
+        return GetStaionName_API(API_KEY, data.flat());
+      })
+      .then((resolve) => { // 측정소 검색
+        let data = JSON.parse(resolve).response.body.items;
+        // console.log('data3', data[0])
+        return GetForth_airConditionValue_API(API_KEY, data[0]) //6;
+      })
+      .then((res) => {
+        let data = JSON.parse(res).response.body.items;
+        setAirCondition([data[0]])
+        // console.log('-------------------------', data)
+      })
+
+  }, [mainSec])
+  
 
   useEffect(() => {
     if (!vilageFcstDaily) return;

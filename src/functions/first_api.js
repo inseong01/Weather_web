@@ -1,5 +1,7 @@
 function getFirstAPI(API_KEY, currentDate, getCurrentTime) { // 1시간 마다
-  const currentTime = getCurrentTime();
+  let getTime = String(getCurrentTime() - 100);
+  let currentTime = getTime.length > 3 ? getTime : '0'.repeat(4 - getTime.length) + getTime;
+  
   return new Promise((resolve, reject) => {
     var xhr1 = new XMLHttpRequest();
     var url1 = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst'; 
@@ -10,7 +12,7 @@ function getFirstAPI(API_KEY, currentDate, getCurrentTime) { // 1시간 마다
     queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('1000');
     queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('JSON');
     queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent(currentDate);
-    queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent(`${currentTime - 100}`); // 현재시간 예보 포함하려면 1시간 전 시각으로 시간 대입
+    queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent(`${currentTime}`); // 현재시간 예보 포함하려면 1시간 전 시각으로 시간 대입
     queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent('56');
     queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent('129');
 
