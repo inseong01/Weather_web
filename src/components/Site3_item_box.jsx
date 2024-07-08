@@ -8,8 +8,10 @@ const days = [
 let num = 1
 let dayNumber = new Date().getDay();
 
-export default function Site3_item_box({ tempArr, idx }) {
+export default function Site3_item_box({ data, idx, icons }) {
   const [day, setDay] = useState('');
+  const [amIcon, setAmIcon] = useState('');
+  const [pmIcon, setPmIcon] = useState('');
   
   useEffect(() => {
     let day = dayNumber + num
@@ -20,18 +22,26 @@ export default function Site3_item_box({ tempArr, idx }) {
       num = 0;
     }
     setDay(days[day]);
+    setAmIcon(icons[idx][0].value);
+    setPmIcon(icons[idx][1].value);
     num++;
   }, [idx])
-  // console.log('day', day)
+  // console.log('data', data)
+
+  useEffect(() => {
+    
+  }, [icons])
 
   return (
     <>
       <div className="item_box">
         <p className="day">{day}</p>
-        <div className="icon"></div>
-        <div className="lowTemp">{tempArr[0]}°</div>
-        <div className="bar"></div>
-        <div className="highTemp">{tempArr[1]}°</div>
+        <div className="dayInfo_wrap">
+          <div className="icon" style={{backgroundImage: amIcon}}></div>
+          <div className="icon" style={{backgroundImage: pmIcon}}></div>
+          <div className="lowTemp">{data[0]}°</div>
+          <div className="highTemp">{data[1]}°</div>
+        </div>
       </div>
     </>
   )

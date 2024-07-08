@@ -19,8 +19,9 @@ sessionStorage.clear()
 // Date
 const getCurrentTime = () => {
   const getCurrentTime = new Date().getHours() + '00';
-  console.log(getCurrentTime)
-  return getCurrentTime
+  let currentTime = getCurrentTime.length > 3 ? getCurrentTime : '0'.repeat(4 - getCurrentTime.length) + getCurrentTime;
+  console.log(currentTime);
+  return currentTime
 }
 const currentDate = new Date().toISOString().slice(0,10).replaceAll('-', '');
 
@@ -107,11 +108,6 @@ const localData = [ // 지역 코드, nx-ny 좌표 중복 있음
   { "nx": 56, "ny": 129, "local": "일산서구 송포동" },
   { "nx": 56, "ny": 129, "local": "일산동구 덕이동" },
   { "nx": 55, "ny": 129, "local": "일산동구 가좌동" }
-]
-const skyCode = [ // 하늘 상태 코드
-  {category: '맑음', value: 1}, 
-  {category: '구름많음', value: 3}, 
-  {category: '흐림', value: 4}, 
 ]
 const PTYCode = [ // 단기 강수형태 코드
   {category: '없음', value: 0},
@@ -220,7 +216,10 @@ function Home() {
     before: [],
     threeDaysLater: [],
   });
-  const [dailyState, setDailyState] = useState();
+  const [dailyState, setDailyState] = useState({
+    twoDays: [],
+    twoDaysLater: [],
+  });
   const [airCondition, setAirCondition] = useState([])
 
   const [mainSec, setMainSec] = useState({
@@ -233,7 +232,8 @@ function Home() {
   })
   const [currentTime, setCurrentTime] = useState('');
   const [filteredData, setFilteredData] = useState([]);
-  const [timeSessionData, setTimeSessionData] = useState([]);
+  const [timeSessionTMPData, setTimeSessionTMPData] = useState([]);
+  const [timeSessionSKYData, setTimeSessionSKYData] = useState([]);
   const [updateTime, setUpdateTime] = useState('');
 
   // 데이터 추출
@@ -266,7 +266,9 @@ function Home() {
     dailyWeatherState_API //3
       .then((resolve) => {
         let data = JSON.parse(resolve).response.body.items.item;
-        setDailyState(data)
+        setDailyState({
+          twoDaysLater: data,
+        })
         return;
       })
     weeklyTemperature_API //4
@@ -307,6 +309,7 @@ function Home() {
   }, [filteredData])
 
   useEffect(() => {
+    console.log('mainSec')
     if (!mainSec.local) return;
     GetXY_Position_API(API_KEY, mainSec.local.replace(/\d/g, ''))
       .then((res) => { // tmX, tmY 좌표 계산
@@ -329,18 +332,28 @@ function Home() {
   }, [mainSec])
   
 
-  useEffect(() => {
+  useEffect(() => { // 단기예보 데이터 분류
     if (!vilageFcstDaily) return;
-    // 최저/최고온도 저장
+
     let highLowTmpArr = [];
+    let weatherState = [];
     for (let i = 0; i < vilageFcstDaily.length; i++) {
       // console.log('vilageFcstDaily', vilageFcstDaily)
+      if (
+        currentDate == vilageFcstDaily[i].fcstDate 
+        && vilageFcstDaily[i].fcstTime < currentTime
+      ) continue;
       if (
         vilageFcstDaily[i].category === 'TMP' || 
         vilageFcstDaily[i].category === 'TMX' || 
         vilageFcstDaily[i].category === 'TMN'
       ) {
         highLowTmpArr.push(vilageFcstDaily[i]);
+      } else if (
+        vilageFcstDaily[i].category === "SKY" ||
+        vilageFcstDaily[i].category === "PTY"
+      ) {
+        weatherState.push(vilageFcstDaily[i]);
       }
     }
     setWeeklyData({
@@ -352,16 +365,49 @@ function Home() {
       highTemp: getHighTemp(highLowTmpArr, mainSec.highTemp, currentTime), // 최고온도 11
       lowTemp: getLowTemp(highLowTmpArr, mainSec.lowTemp, currentTime), // 최고온도 11
     })
-    // timeSessionData 추출
+    // timeSessionTMPData 추출
+    let dailyArr = [];
     let dailyTMP = [];
-    highLowTmpArr.forEach((value) => {
-      if (currentDate == value.fcstDate && value.fcstTime < currentTime) return;
-      dailyTMP.push(value)
+    let dailyWeather = [];
+    // console.log('selectedVilageFcst', selectedVilageFcst)
+    for (let i = 0; i < highLowTmpArr.length; i++) { // 시간 별 기온
+      let item = [];
+      if (dailyTMP.length > 9) continue;
+      if (highLowTmpArr[i].category !== "TMP") continue;
+      item = highLowTmpArr[i];
+      dailyTMP.push(item);
+    }
+    for (let i = 0; i < weatherState.length; i+=2) { // 시간 별 날씨
+      let item = [];
+      if (dailyWeather.length > 9) {
+        setTimeSessionTMPData(dailyTMP);
+        setTimeSessionSKYData(dailyWeather);
+        continue;
+      }
+      if (weatherState[i].fcstTime === weatherState[i+1].fcstTime) { // [{SKY}, {PTY}]
+        item = [weatherState[i], weatherState[i+1]];
+      }
+      dailyWeather.push(item);
+    }
+    let justTwoDays = [];
+    for (let i = 0; i < weatherState.length; i++) { // 일간 날씨 이틀치
+      let arr = [];
+      // console.log('weatherState[i].fcstDate', weatherState[i].fcstDate, currentDate)
+      if (weatherState[i].fcstDate === currentDate) continue;
+      if (
+        weatherState[i].fcstTime === "0600" ||
+        weatherState[i].fcstTime === "1800"
+      ) {
+        justTwoDays.push(weatherState[i]);
+      }
+    }
+    setDailyState({
+      ...dailyState,
+      twoDays: justTwoDays,
     })
-    setTimeSessionData(dailyTMP);
   }, [vilageFcstDaily])
-  
-  // console.log('weeklyData', weeklyData)
+  // console.log('timeSessionTMPData', timeSessionTMPData)
+  // console.log('dailyState', dailyState)
 
 
   // 현재 시간 받아오면서 자동 새로고침, 수동 새로고침 버튼 삽입
@@ -372,9 +418,9 @@ function Home() {
       <div className="Home_wrap">
         <div className="header_wrap">
           <div className="site_wrap">
-            <Site1 data={mainSec} />
-            <Site2 data={timeSessionData} time={mainSec.baseTime} />
-            <Site3 data={weeklyData} date={currentDate} />
+            {/* <Site1 data={mainSec} /> */}
+            <Site2 temperature={timeSessionTMPData} sky={timeSessionSKYData} time={mainSec.baseTime} />
+            <Site3 data={weeklyData} weatherState={dailyState} />
             <Site4 data={airCondition} />
           </div>
         </div>

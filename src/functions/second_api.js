@@ -6,7 +6,7 @@ const getSecondAPI = (key, currentDate) => { // 3시간 마다
     var queryParams = '?' + encodeURIComponent('serviceKey') + '=' + `${key}`; 
     /* Service Key */
     queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1');
-    queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('744');
+    queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('780');
     queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('JSON');
     queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent(`${currentDate}`);
     queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent('0200');

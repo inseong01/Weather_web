@@ -44,7 +44,9 @@
 .site2 .item_box .icon {
   width: 45px;
   height: 35px;
-  background-color: #D9D9D9;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 .site2 .swiper {
   width: 100%;
@@ -66,20 +68,23 @@
 .site3 .item_box:last-child {
   margin-bottom: 0;
 }
+.site3 .dayInfo_wrap {
+  width: 55%;
+  display: flex;
+  justify-content: space-between;
+}
 .site3 .item_box .day {
   display: inline-block;
-  margin-right: 70px;
 }
 .site3 .item_box .icon {
   width: 35px;
   height: 35px;
-  background-color: #D9D9D9;
-  margin-right: 20px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
-.site3 .item_box .bar {
-  width: 115px;
-  height: 5px;
-  background-color: #D9D9D9;
+.site3 .dayInfo_wrap .lowTemp {
+  margin-left: 20px;
 }
 
 .site4 .item_box_wrap {

@@ -13,15 +13,15 @@ const calculateAirQualityIndexCSS = (grade, value) => {
   switch (true) {
     case grade === "좋음":
       transitionXValue = (value / 30) * 25 ? ((value / 30) * 25) : 0;
-      bgColor = '#3CB371';
+      bgColor = '#4e97f5';
       break;
     case  grade === "보통" :
       transitionXValue = (value / 80) * 25 + 25 > 25 ? ((value / 80) * 25 + 25) : 26;
-      bgColor = '#FFD700';
+      bgColor = '#3CB371';
       break;
     case  grade === "나쁨" :
       transitionXValue = (value / 150) * 25 + 50 > 50 ? ((value / 150) * 25 + 50) : 51;
-      bgColor = '#FFA500';
+      bgColor = '#FFD700';
       break;
     case grade === "아주나쁨" :
       transitionXValue = (value / 151) * 25 + 50 < 100 ? ((value / 151) * 25 + 50) : 100;
