@@ -7,6 +7,7 @@ import Site1 from '../components/Site1'
 import Site2 from '../components/Site2'
 import Site3 from '../components/Site3'
 import Site4 from '../components/Site4'
+import Site5 from '../components/Site5'
 import GetSecond_weatherState_API from '../functions/second_weatherState_api'
 import GetThird_temperature_API from '../functions/third_temperature_api'
 import GetSecondAPI from '../functions/second_api'
@@ -215,6 +216,7 @@ function Home() {
   const [weeklyData, setWeeklyData] = useState({
     before: [],
     threeDaysLater: [],
+    otherData: [],
   });
   const [dailyState, setDailyState] = useState({
     twoDays: [],
@@ -236,7 +238,7 @@ function Home() {
   const [timeSessionSKYData, setTimeSessionSKYData] = useState([]);
   const [updateTime, setUpdateTime] = useState('');
 
-  // 데이터 추출
+  // API 데이터 추출
   useEffect(() => {
     let res1;
     let res2;
@@ -331,13 +333,14 @@ function Home() {
 
   }, [mainSec])
   
-
+  // 사용 데이터 추출
   useEffect(() => { // 단기예보 데이터 분류
     if (!vilageFcstDaily) return;
 
-    let highLowTmpArr = [];
+    let beforeArr = [];
     let weatherState = [];
-    for (let i = 0; i < vilageFcstDaily.length; i++) {
+    let otherDataArr = [];
+    for (let i = 0; i < vilageFcstDaily.length; i++) { 
       // console.log('vilageFcstDaily', vilageFcstDaily)
       if (
         currentDate == vilageFcstDaily[i].fcstDate 
@@ -346,35 +349,37 @@ function Home() {
       if (
         vilageFcstDaily[i].category === 'TMP' || 
         vilageFcstDaily[i].category === 'TMX' || 
-        vilageFcstDaily[i].category === 'TMN'
+        vilageFcstDaily[i].category === 'TMN' 
       ) {
-        highLowTmpArr.push(vilageFcstDaily[i]);
+        beforeArr.push(vilageFcstDaily[i]);
       } else if (
         vilageFcstDaily[i].category === "SKY" ||
         vilageFcstDaily[i].category === "PTY"
       ) {
         weatherState.push(vilageFcstDaily[i]);
+      } else if (vilageFcstDaily[i].category === 'REH') {
+        otherDataArr.push(vilageFcstDaily[i]);
       }
     }
     setWeeklyData({
       ...weeklyData,
-      before: highLowTmpArr,
+      before: beforeArr,
+      otherData: otherDataArr,
     })
     setMainSec({
       ...mainSec,
-      highTemp: getHighTemp(highLowTmpArr, mainSec.highTemp, currentTime), // 최고온도 11
-      lowTemp: getLowTemp(highLowTmpArr, mainSec.lowTemp, currentTime), // 최고온도 11
+      highTemp: getHighTemp(beforeArr, mainSec.highTemp, currentTime), // 최고온도 11
+      lowTemp: getLowTemp(beforeArr, mainSec.lowTemp, currentTime), // 최고온도 11
     })
     // timeSessionTMPData 추출
-    let dailyArr = [];
     let dailyTMP = [];
     let dailyWeather = [];
     // console.log('selectedVilageFcst', selectedVilageFcst)
-    for (let i = 0; i < highLowTmpArr.length; i++) { // 시간 별 기온
+    for (let i = 0; i < beforeArr.length; i++) { // 시간 별 기온
       let item = [];
       if (dailyTMP.length > 9) continue;
-      if (highLowTmpArr[i].category !== "TMP") continue;
-      item = highLowTmpArr[i];
+      if (beforeArr[i].category !== "TMP") continue;
+      item = beforeArr[i];
       dailyTMP.push(item);
     }
     for (let i = 0; i < weatherState.length; i+=2) { // 시간 별 날씨
@@ -416,14 +421,13 @@ function Home() {
   return (
     <>
       <div className="Home_wrap">
-        <div className="header_wrap">
+          <Site1 data={mainSec} />
           <div className="site_wrap">
-            {/* <Site1 data={mainSec} /> */}
             <Site2 temperature={timeSessionTMPData} sky={timeSessionSKYData} time={mainSec.baseTime} />
-            <Site3 data={weeklyData} weatherState={dailyState} />
+            <Site3 data={weeklyData} weatherState={dailyState} currentDate={currentDate} />
             <Site4 data={airCondition} />
+            <Site5 data={ultraSrtFcstData} currentTime={currentTime} />
           </div>
-        </div>
       </div>
     </>
   )

@@ -9,7 +9,6 @@ const getWeatherIconNameTranslator = (str) => {
     if (!str.includes(word)) return;
     code = idx;
   })
-  console.log(code);
 
   switch (true) {
     case code === 0 :

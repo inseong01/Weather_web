@@ -10,10 +10,10 @@ const keys =  [
   'taMin4', 'taMax4', 'taMin5', 'taMax5', 'taMin6', 'taMax6'
 ];
 
-const mergeWeekData = (data) => {
+const mergeWeekData = (data, currentDate) => {
   let num = 0;
   let weekArr = [];
-  const threeDaysBefore = [...data.before].filter((item) => 
+  const threeDaysBefore = [...data.before].filter(item => item.fcstDate !== currentDate).filter((item) => 
     item.category === 'TMN' || item.category === 'TMX'
   )
 
@@ -41,6 +41,7 @@ const mergeWeekData = (data) => {
   
   // 합병
   let collectTemp = [];
+  // console.log('arr', arr)
   for (let i = 0; i < arr.length; i+=2) { // 오류나면 arr의 fcstDate 확인(16시 전 i=1, 이후 i=0, ???)
     let mergeArr = [
       Number(arr[i].value).toFixed(0),
@@ -77,22 +78,35 @@ const mergeWeatherTwoDays = (data) => {
   }
   return value;
 }
+const getWeeklyMoistureData = (data) => {
+  let arr = [];
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].category !== "REH") continue; // 다른 데이터 추출 시, 조건 추가
+    arr.push(data[i]);
+  }
+  return arr;
+}
 
-export default function Site3({ data, weatherState }) {
+export default function Site3({ data, weatherState, currentDate }) { // data = [{단기예보}, {주간최고/저온도}]
   const [weekTempArr, setWeekTempArr] = useState([]);
+  const [weekOtherData, setWeekOtherData] = useState([]);
   const [weekWeatherArr, setWeekWeatherArr] = useState([]);
 
   useEffect(() => {
     if (!data.before.length) return;
-    // 일간 기온 최저/최고 병합
-    let arr = mergeWeekData(data);
-    setWeekTempArr(arr);
+    // 주간 기온 최저/최고 병합
+    let mergedArr = mergeWeekData(data, currentDate);
+    setWeekTempArr(mergedArr);
+    // 주간 습도 (4일치 데이터 부족)
+    // let moistureArr = getWeeklyMoistureData(data.otherData)
+    // console.log('moistureArr', moistureArr)
+    // setWeekOtherData(otherDataArr);
   }, [data])
 
   useEffect(() => {
     // console.log('weatherState', weatherState.twoDays)
     if (!weatherState.twoDays) return;
-    // 일간 날씨 아이콘
+    // 주간 날씨 아이콘
     let twoDaysWeather = mergeWeatherTwoDays(weatherState.twoDays);
     let twoDaysLaterWeather = []; 
     let box = [];
@@ -116,7 +130,7 @@ export default function Site3({ data, weatherState }) {
     // console.log('twoDaysLaterWeather', twoDaysLaterWeather)
     setWeekWeatherArr(twoDaysWeather.concat(twoDaysLaterWeather));
   }, [weatherState])
-  console.log('weekWeatherArr', weekWeatherArr)
+  // console.log('weekWeatherArr', weekWeatherArr)
   
   return (
     <>
