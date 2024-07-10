@@ -15,7 +15,11 @@ import GetFirstAPI from '../functions/first_api'
 import GetForth_airConditionValue_API from '../functions/forth_airConditionValue_api'
 import GetXY_Position_API from '../functions/forth_xyPosition_API'
 import GetStaionName_API from '../functions/forth_stationName'
+import GetGeolocation from '../functions/getGeolocation'
 sessionStorage.clear()
+
+// geoLocation
+const geolocation = GetGeolocation(); // [위도_d, 위도_f, 경도_d, 경도_f]
 
 // Date
 const getCurrentTime = () => {
@@ -28,11 +32,6 @@ const currentDate = new Date().toISOString().slice(0,10).replaceAll('-', '');
 
 // API
 const API_KEY = 'dviGmZuftX3h7VNSS2UVxZ1M7AfjXEQRTTQVoMhes28TPZETMMXENDJ%2FT60N5MkIHuZGTVGLZqYBfbZTwGUPUw%3D%3D'
-
-const dailyWeather_API = GetFirstAPI(API_KEY, currentDate, getCurrentTime);
-const dailyHoursTemperature_API = GetSecondAPI(API_KEY, currentDate);
-const dailyWeatherState_API = GetSecond_weatherState_API(API_KEY, currentDate);
-const weeklyTemperature_API = GetThird_temperature_API(API_KEY, currentDate);
 
 // 코드 모음
 const ultraSrtFcstCategory = [ // 초단기예보
@@ -64,52 +63,6 @@ const vilageFcstCategory = [ // 단기예보
 	{category: 'WSD',	value: '풍속'}, //	m/s	10
 
 ]
-const localData = [ // 지역 코드, nx-ny 좌표 중복 있음
-  { "nx": 57, "ny": 128, "local": "덕양구 주교동" },
-  { "nx": 57, "ny": 129, "local": "덕양구 원신동" },
-  { "nx": 58, "ny": 128, "local": "덕양구 흥도동" },
-  { "nx": 57, "ny": 129, "local": "덕양구 성사1동" },
-  { "nx": 57, "ny": 128, "local": "덕양구 성사2동" },
-  { "nx": 59, "ny": 128, "local": "덕양구 효자동" },
-  { "nx": 58, "ny": 129, "local": "덕양구 삼송1동" },
-  { "nx": 58, "ny": 129, "local": "덕양구 삼송2동" },
-  { "nx": 58, "ny": 128, "local": "덕양구 창릉동" },
-  { "nx": 59, "ny": 130, "local": "덕양구 고양동" },
-  { "nx": 58, "ny": 129, "local": "덕양구 관산동" },
-  { "nx": 57, "ny": 128, "local": "덕양구 능곡동" },
-  { "nx": 57, "ny": 128, "local": "덕양구 화정1동" },
-  { "nx": 57, "ny": 128, "local": "덕양구 화정2동" },
-  { "nx": 57, "ny": 128, "local": "덕양구 행주동" },
-  { "nx": 57, "ny": 128, "local": "덕양구 행신1동" },
-  { "nx": 57, "ny": 128, "local": "덕양구 행신2동" },
-  { "nx": 57, "ny": 128, "local": "덕양구 행신3동" },
-  { "nx": 58, "ny": 128, "local": "덕양구 행신4동" },
-  { "nx": 58, "ny": 127, "local": "덕양구 화전동" },
-  { "nx": 58, "ny": 127, "local": "덕양구 대덕동" },
-  { "nx": 56, "ny": 129, "local": "일산동구 식사동" },
-  { "nx": 56, "ny": 129, "local": "일산동구 중산1동" },
-  { "nx": 56, "ny": 129, "local": "일산동구 중산2동" },
-  { "nx": 56, "ny": 129, "local": "일산동구 정발산동" },
-  { "nx": 57, "ny": 129, "local": "일산동구 풍산동" },
-  { "nx": 57, "ny": 128, "local": "일산동구 백석1동" },
-  { "nx": 57, "ny": 128, "local": "일산동구 백석2동" },
-  { "nx": 57, "ny": 129, "local": "일산동구 마두1동" },
-  { "nx": 56, "ny": 128, "local": "일산동구 마두2동" },
-  { "nx": 56, "ny": 128, "local": "일산동구 장항1동" },
-  { "nx": 56, "ny": 128, "local": "일산동구 장항2동" },
-  { "nx": 57, "ny": 130, "local": "일산동구 고봉동" },
-  { "nx": 56, "ny": 129, "local": "일산서구 일산1동" },
-  { "nx": 56, "ny": 129, "local": "일산서구 일산2동" },
-  { "nx": 56, "ny": 129, "local": "일산서구 일산3동" },
-  { "nx": 56, "ny": 129, "local": "일산서구 탄현1동" },
-  { "nx": 56, "ny": 130, "local": "일산서구 탄현2동" },
-  { "nx": 56, "ny": 129, "local": "일산서구 주엽1동" },
-  { "nx": 56, "ny": 129, "local": "일산서구 주엽2동" },
-  { "nx": 56, "ny": 129, "local": "일산서구 대화동" },
-  { "nx": 56, "ny": 129, "local": "일산서구 송포동" },
-  { "nx": 56, "ny": 129, "local": "일산동구 덕이동" },
-  { "nx": 55, "ny": 129, "local": "일산동구 가좌동" }
-]
 const PTYCode = [ // 단기 강수형태 코드
   {category: '없음', value: 0},
   {category: '비', value: 1},
@@ -122,19 +75,16 @@ const vilageUpdateTime = [
 ];
 
 // 계산 함수
-const getLocal = (x, y) => { // 주소 선택
-  let i  = 0;
-  let local = []
-  localData.forEach((value) => { // "덕양구 주교동"
-    if (value.nx != x) return;
-    if (value.ny == y) {
-      // console.log(value.local)
-      local[i] = value.local;
-      // console.log('local', local)
-      i++
-    }
-  })
-  return local[7];
+const getLocal = (secondLc, thirdLc) => { // 주소 선택
+  let location;
+  let splitedSecondLc = secondLc.split(/(?<=.*?[시군])/); // ["~시|군", "~구"]
+  if (splitedSecondLc.length > 1) {
+    location = splitedSecondLc[1] + ' ' + thirdLc;
+  } else {
+    location = secondLc + ' ' + thirdLc;
+  }
+  // console.log('location', location)
+  return location;
 }
 const getTemp = (data) => {
   let temperature;
@@ -210,7 +160,7 @@ const findPreviousUpdateTime = (arr, currentTime) => {
 };
 
 
-function Home() {
+function Home({ geoLocationData }) {
   const [ultraSrtFcstData, setUltraSrtFcstData] = useState(); // 초단기예보 
   const [vilageFcstDaily, setVilageFcstDaily] = useState(); // 단기예보 
   const [weeklyData, setWeeklyData] = useState({
@@ -237,13 +187,38 @@ function Home() {
   const [timeSessionTMPData, setTimeSessionTMPData] = useState([]);
   const [timeSessionSKYData, setTimeSessionSKYData] = useState([]);
   const [updateTime, setUpdateTime] = useState('');
+  const [currentLocation, setCurrentLocation] = useState({});
+
+  // 현재위치
+  useEffect(() => {
+    if (!geoLocationData) return;
+    let selectedLocations = []; // [{단기예보 엑셀 행}, {...}, ...]
+    for (let i = 0; i < geoLocationData.length; i++) {
+      if (
+        +geoLocationData[i]["경도(시)"] !== geolocation[2] ||
+        +geoLocationData[i]["경도(분)"] !== geolocation[3] ||
+        +geoLocationData[i]["위도(분)"] !== geolocation[1] 
+      ) continue;
+      // console.log('geoLocationData', geoLocationData[i]);
+      selectedLocations.push(geoLocationData[i]);
+    }
+    setCurrentLocation(selectedLocations);
+
+    // 현재시간
+    setCurrentTime(getCurrentTime);
+    const previousUpdateTime = findPreviousUpdateTime(vilageUpdateTime, currentTime);
+    setUpdateTime(previousUpdateTime)
+  }, [geoLocationData])
+  // console.log('currentLocation', currentLocation);
 
   // API 데이터 추출
   useEffect(() => {
+    if (!currentLocation[0]) return;
     let res1;
     let res2;
-    dailyWeather_API //1
+    GetFirstAPI(API_KEY, currentDate, getCurrentTime, currentLocation[0]) //1
       .then((resolve) => {
+        // console.log('resolve', resolve)
         res1 = JSON.parse(resolve).response.body.items.item;
         res1.map(value => { // 번역
           ultraSrtFcstCategory.forEach(e => {
@@ -255,7 +230,7 @@ function Home() {
         setUltraSrtFcstData(res1);
         return;
       })
-    dailyHoursTemperature_API //2
+    GetSecondAPI(API_KEY, currentDate, currentLocation[0]) //2
       .then((result) => {
         res2 = JSON.parse(result).response.body.items.item;
         // res2.map((value) => {
@@ -265,7 +240,7 @@ function Home() {
         
         return result + 1;
       })
-    dailyWeatherState_API //3
+    GetSecond_weatherState_API(API_KEY, currentDate, currentLocation[0]) //3
       .then((resolve) => {
         let data = JSON.parse(resolve).response.body.items.item;
         setDailyState({
@@ -273,7 +248,7 @@ function Home() {
         })
         return;
       })
-    weeklyTemperature_API //4
+    GetThird_temperature_API(API_KEY, currentDate, currentLocation[0]) //4
       .then((resolve) => {
         let data = JSON.parse(resolve).response.body.items.item;
         setWeeklyData({
@@ -283,10 +258,7 @@ function Home() {
         return;
       })
 
-    setCurrentTime(getCurrentTime);
-    const previousUpdateTime = findPreviousUpdateTime(vilageUpdateTime, currentTime);
-    setUpdateTime(previousUpdateTime)
-  }, [])
+  }, [currentLocation])
   // console.log('airCondition', !airCondition[0].PM10)
 
   // 데이터 분류
@@ -303,7 +275,7 @@ function Home() {
     if (!filteredData.length) return
     setMainSec({
       ...mainSec,
-      local: getLocal(filteredData[0].nx, filteredData[0].ny), // 위치
+      local: getLocal(currentLocation[0]["2단계"], currentLocation[0]["3단계"]), // 위치
       temp: getTemp(filteredData), // 기온
       sky: getSky(filteredData), // 하늘
       baseTime: currentTime,
@@ -334,13 +306,13 @@ function Home() {
   }, [mainSec])
   
   // 사용 데이터 추출
-  useEffect(() => { // 단기예보 데이터 분류
+  useEffect(() => { 
     if (!vilageFcstDaily) return;
 
     let beforeArr = [];
     let weatherState = [];
     let otherDataArr = [];
-    for (let i = 0; i < vilageFcstDaily.length; i++) { 
+    for (let i = 0; i < vilageFcstDaily.length; i++) { // 단기예보 데이터 분류
       // console.log('vilageFcstDaily', vilageFcstDaily)
       if (
         currentDate == vilageFcstDaily[i].fcstDate 
@@ -369,7 +341,7 @@ function Home() {
     setMainSec({
       ...mainSec,
       highTemp: getHighTemp(beforeArr, mainSec.highTemp, currentTime), // 최고온도 11
-      lowTemp: getLowTemp(beforeArr, mainSec.lowTemp, currentTime), // 최고온도 11
+      lowTemp: getLowTemp(beforeArr, mainSec.lowTemp, currentTime), // 최저온도 11
     })
     // timeSessionTMPData 추출
     let dailyTMP = [];

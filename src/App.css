@@ -33,3 +33,32 @@ img, video {
 ul, li, ol {
   list-style: none;
 }
+
+/* 엑셀 */
+.fileLoad_wrap {
+  top: 0;
+  left: 0;
+  position: absolute;
+  padding: 10px;
+  transition: 0.3s;
+  opacity: 0;
+}
+.fileLoad_wrap:hover {
+  opacity: 1;
+}
+.fileLoad_wrap .upload {
+  background-color: transparent;
+  border: 1px solid #222;
+  padding: 3px;
+}
+.fileLoad_wrap .loadData {
+  color: white;
+  background-color: #222;
+  padding: 5px;
+  border: 1px solid #222;
+}
+.fileLoad_wrap .upload[type="file"] {
+  border: 1px solid #222;
+  color: white;
+  /* background-color: transparent; */
+}

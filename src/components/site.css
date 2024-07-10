@@ -1,7 +1,6 @@
 .first_site {
   width: 100%;
   text-align: center;
-  margin: 50px 0 0;
   padding-bottom: 0;
 }
 .first_site .title {
@@ -26,7 +25,7 @@
 }
 
 .item_box_wrap {
-  width: 100%;
+  width: calc(100% - 15px);
   height: auto;
   border-radius: 15px;
   background-color: #333;
@@ -34,6 +33,10 @@
   padding: 20px;
   font-size: 15px;
   font-weight: 500;
+}
+.site2 .item_box_wrap,
+.site3 .item_box_wrap {
+  width: 100%;
 }
 
 .site2 {
@@ -55,6 +58,8 @@
 .site2 .swiper {
   width: 100%;
   margin-top: 20px;
+  cursor: grab;
+  user-select: none;
 }
 
 .site3 {
@@ -98,6 +103,7 @@
   width: 50%;
 }
 .site4 .item_box_wrap {
+  height: 120px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -147,6 +153,7 @@
   width: 50%;
 }
 .site5 .box_wrap {
+  width: calc(100% - 15px);
   display: flex;
   justify-content: space-between;
   align-items: center;

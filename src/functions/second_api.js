@@ -1,4 +1,7 @@
-const getSecondAPI = (key, currentDate) => { // 3시간 마다
+const getSecondAPI = (key, currentDate, currentLocation) => { // 3시간 마다
+  let nx = currentLocation["격자 X"];
+  let ny = currentLocation["격자 Y"];
+  
   return new Promise((resolev, reject) => {
     var xhr2 = new XMLHttpRequest();
     var url2 = 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst'; 
@@ -10,8 +13,8 @@ const getSecondAPI = (key, currentDate) => { // 3시간 마다
     queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('JSON');
     queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent(`${currentDate}`);
     queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent('0200');
-    queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent('56');
-    queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent('129');
+    queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent(`${nx}`);
+    queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent(`${ny}`);
   
     xhr2.open('GET', url2 + queryParams, true);  // 비동기 요청을 위해 true로 설정
   

@@ -1,4 +1,7 @@
-const GetThird_temperature_API = (key, currentDate) => { // 1일 2회(06, 18)
+const GetThird_temperature_API = (key, currentDate, currentLocation) => { // 1일 2회(06, 18) 중기기온예보
+  // 엑셀파일 2개 올리는 방법,
+  // currentLocation > 함수 적용해서 regId 추출
+  
   return new Promise((resolev, reject) => {
     let xhr = new XMLHttpRequest();
     let url = 'http://apis.data.go.kr/1360000/MidFcstInfoService/getMidTa'; 
@@ -6,7 +9,7 @@ const GetThird_temperature_API = (key, currentDate) => { // 1일 2회(06, 18)
     queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1');
     queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10');
     queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('JSON');
-    queryParams += '&' + encodeURIComponent('regId') + '=' + encodeURIComponent('11B20302');
+    queryParams += '&' + encodeURIComponent('regId') + '=' + encodeURIComponent('11B20302'); // 지역ID
     queryParams += '&' + encodeURIComponent('tmFc') + '=' + encodeURIComponent(`${currentDate}0600`);
   
     xhr.open('GET', url + queryParams, true);  // 비동기 요청을 위해 true로 설정

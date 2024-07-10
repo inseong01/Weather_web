@@ -1,7 +1,7 @@
-function getFirstAPI(API_KEY, currentDate, getCurrentTime) { // 1시간 마다
+function getFirstAPI(API_KEY, currentDate, getCurrentTime, currentLocation) { // 1시간 마다
   let getTime = String(getCurrentTime() - 100);
   let currentTime = getTime.length > 3 ? getTime : '0'.repeat(4 - getTime.length) + getTime;
-  
+
   return new Promise((resolve, reject) => {
     var xhr1 = new XMLHttpRequest();
     var url1 = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst'; 
@@ -13,8 +13,8 @@ function getFirstAPI(API_KEY, currentDate, getCurrentTime) { // 1시간 마다
     queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('JSON');
     queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent(currentDate);
     queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent(`${currentTime}`); // 현재시간 예보 포함하려면 1시간 전 시각으로 시간 대입
-    queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent('56');
-    queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent('129');
+    queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent(`${currentLocation["격자 X"]}`);
+    queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent(`${currentLocation["격자 Y"]}`);
 
     xhr1.open('GET', url1 + queryParams, true);  // 비동기 요청을 위해 true로 설정
 
