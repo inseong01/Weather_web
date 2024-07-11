@@ -1,6 +1,6 @@
-function getFirstAPI(API_KEY, currentDate, getCurrentTime, currentLocation) { // 1시간 마다
-  let getTime = String(getCurrentTime() - 100);
-  let currentTime = getTime.length > 3 ? getTime : '0'.repeat(4 - getTime.length) + getTime;
+function getFirstAPI(API_KEY, currentDate, currentTime, currentLocation) { // 1시간 마다
+  let getTime = String(currentTime - 100);
+  let beforeOneHour = getTime.length > 3 ? getTime : '0'.repeat(4 - getTime.length) + getTime;
 
   return new Promise((resolve, reject) => {
     var xhr1 = new XMLHttpRequest();
@@ -12,7 +12,7 @@ function getFirstAPI(API_KEY, currentDate, getCurrentTime, currentLocation) { //
     queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('1000');
     queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('JSON');
     queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent(currentDate);
-    queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent(`${currentTime}`); // 현재시간 예보 포함하려면 1시간 전 시각으로 시간 대입
+    queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent(`${beforeOneHour}`); // 현재시간 예보 포함하려면 1시간 전 시각으로 시간 대입
     queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent(`${currentLocation["격자 X"]}`);
     queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent(`${currentLocation["격자 Y"]}`);
 

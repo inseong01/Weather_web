@@ -1,6 +1,10 @@
-const GetThird_temperature_API = (key, currentDate, currentLocation) => { // 1일 2회(06, 18) 중기기온예보
-  // 엑셀파일 2개 올리는 방법,
-  // currentLocation > 함수 적용해서 regId 추출
+const GetThird_temperature_API = (key, currentDate, currentLocation, midFcstMapData) => { // 1일 2회(06, 18) 중기기온예보
+  let regId;
+  let secondLc = currentLocation["2단계"].split(/[시군]/)[0]; // ["~시", "~구"]
+  for (let i = 0; i < midFcstMapData.length; i++) {
+    if (!midFcstMapData[i]["지역"].includes(secondLc)) continue;
+    regId = midFcstMapData[i]["코드"];
+  }
   
   return new Promise((resolev, reject) => {
     let xhr = new XMLHttpRequest();
@@ -9,7 +13,7 @@ const GetThird_temperature_API = (key, currentDate, currentLocation) => { // 1�
     queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1');
     queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10');
     queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('JSON');
-    queryParams += '&' + encodeURIComponent('regId') + '=' + encodeURIComponent('11B20302'); // 지역ID
+    queryParams += '&' + encodeURIComponent('regId') + '=' + encodeURIComponent(`${regId}`); // 지역ID
     queryParams += '&' + encodeURIComponent('tmFc') + '=' + encodeURIComponent(`${currentDate}0600`);
   
     xhr.open('GET', url + queryParams, true);  // 비동기 요청을 위해 true로 설정

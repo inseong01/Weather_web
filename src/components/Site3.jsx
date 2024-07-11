@@ -62,7 +62,8 @@ const mergeWeatherTwoDays = (data) => {
   }
   let value = [];
   let num = 1;
-  for (let i = 0; i < mergeBox.length; i+=2) {
+  // console.log('mergeBox', mergeBox)
+  for (let i = 0; i < mergeBox.length; i+=2) { // length === 4
     let name = [{
       key: `wf${num}AM`, 
       value: getWeatherIconName(+mergeBox[i][0].fcstValue, +mergeBox[i][1].fcstValue),
@@ -97,10 +98,6 @@ export default function Site3({ data, weatherState, currentDate }) { // data = [
     // 주간 기온 최저/최고 병합
     let mergedArr = mergeWeekData(data, currentDate);
     setWeekTempArr(mergedArr);
-    // 주간 습도 (4일치 데이터 부족)
-    // let moistureArr = getWeeklyMoistureData(data.otherData)
-    // console.log('moistureArr', moistureArr)
-    // setWeekOtherData(otherDataArr);
   }, [data])
 
   useEffect(() => {

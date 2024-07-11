@@ -158,7 +158,7 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 15px;
   /* padding: 0 20px; */
 }
 .site5 .item_box_wrap {
@@ -194,7 +194,7 @@
   padding: 20px;
   transition: 0.5s;
   transform: translateY(100%);
-  font-size: 10px;
+  font-size: 12px;
 
   display: flex;
   align-items: center;
