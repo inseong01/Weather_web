@@ -9,7 +9,7 @@ export default function Site1({ data }) {
 
   return (
     <>
-      <div className="first_site">
+      <div className="first_site" data-aos="fade-up" data-aos-delay="200">
         <div className="title">나의 위치</div>
         <div className="local">{local}</div>
         <div className="temp">{temp}°</div>

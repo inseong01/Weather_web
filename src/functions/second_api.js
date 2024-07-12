@@ -4,11 +4,11 @@ const getSecondAPI = (key, currentDate, currentLocation, updateTime, row, yester
   let base_time = updateTime ? updateTime : '2300';
   let numOfRows = row ? row : '780';
   let base_date = currentDate;
-  if (currentTime < "0200") {
+  if (currentTime < "0300") {
     base_date = yesterday;
     numOfRows = '1000';
   }
-  console.log('base_time', base_time, updateTime)
+  // console.log('base_time', base_time, base_date)
 
   return new Promise((resolev, reject) => {
     var xhr2 = new XMLHttpRequest();

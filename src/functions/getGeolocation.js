@@ -1,9 +1,9 @@
-// const success = (props) => {
+// const success = (props) => { // 허용
 //   let latitude = props.coords.latitude; // 위도
 //   let longitude = props.coords.longitude; // 경도
 //   return [latitude.toFixed(6), longitude.toFixed(6)];
 // }
-const error = () => {
+const error = () => { // 거부
   console.log('getGeolocationo Error');
   return [37.694324, 126.768418] // 기본값
 }

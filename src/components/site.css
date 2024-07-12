@@ -103,6 +103,7 @@
   width: 50%;
 }
 .site4 .item_box_wrap {
+  width: calc(100% - 10px);
   height: 120px;
   display: flex;
   justify-content: space-between;
@@ -153,12 +154,12 @@
   width: 50%;
 }
 .site5 .box_wrap {
-  width: calc(100% - 15px);
+  width: calc(100% - 10px);
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 10px;
   /* padding: 0 20px; */
 }
 .site5 .item_box_wrap {

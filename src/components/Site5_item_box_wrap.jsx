@@ -28,7 +28,7 @@ const infoAboutCategoty = (category) => {
   let info = "";
   switch (true) {
     case category === "낙뢰" :
-      info = "kA는 단위 면적당 전류의 양을 나타내는 물리량입니다. 이 값이 클수록 해당 면적에서 더 많은 전류가 흐르고 있다는 것을 의미";
+      info = "kA는 단위 면적당 전류의 양을 나타내는 물리량. 이 값이 클수록 해당 면적에서 더 많은 전류가 흐르고 있다는 것을 의미";
       break;
     case category === "1시간 강수량" :
       info = "1mm 미만 : 빗소리가 거의 들리지 않음, 2~5mm: 보통의 비, 30mm 이상: 호우특보";
@@ -75,7 +75,7 @@ export default function Site5_item_box_wrap({ data }) { // [[...], [...], ...]
 
   return (
     <>
-      <div className="item_box_wrap" onMouseLeave={onMouseLeaveInput}>
+      <div className="item_box_wrap" onMouseLeave={onMouseLeaveInput} >
           <div className="item_box">
             <div className="title_wrap">
               <p className="title">{data.category}</p>

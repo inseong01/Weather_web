@@ -21,7 +21,7 @@ const mergeWeekData = (data, currentDate) => {
   const resultArray = data.threeDaysLater.map(item => 
     Object.entries(item).map(([key, value]) => ({ key, value }))
   ).flat()
-
+  // console.log('data', data)
   threeDaysBefore.map(item => {
     if (item.category === 'TMN') {
       item['key'] = `taMin${num}`;

@@ -1,7 +1,9 @@
 /* eslint-disable */
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import './Home.css'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
 import UseTitle from '../hooks/UseTitle'
 import Site1 from '../components/Site1'
 import Site2 from '../components/Site2'
@@ -15,14 +17,11 @@ import GetFirstAPI from '../functions/first_api'
 import GetForth_airConditionValue_API from '../functions/forth_airConditionValue_api'
 import GetXY_Position_API from '../functions/forth_xyPosition_API'
 import GetStaionName_API from '../functions/forth_stationName'
-import GetGeolocation from '../functions/getGeolocation'
 import getSecondAPI_lowtemp from '../functions/second_api_lowTemp'
 import filteringVilageFcstDaily from '../functions/filteringVilageFcstDaily'
 import getSecondAPI_temp from '../functions/second_api_temp'
 sessionStorage.clear()
 
-// geoLocation
-const geolocation = GetGeolocation(); // [위도_d, 위도_f, 경도_d, 경도_f]
 
 // Date
 const getCurrentTime = () => {
@@ -31,12 +30,9 @@ const getCurrentTime = () => {
   console.log(currentTime);
   return currentTime
 }
-// --------------    예외처리 적용점검      ----------------------
 let currentTime = getCurrentTime();
-// let currentTime = "0000";
+// let currentTime = "0000"; // 예외처리 적용 시험 데이터
 let currentDate = new Date().toISOString().slice(0,10).replaceAll('-', '');
-// let vilageTime = "0000";
-let vilageTime = currentTime;
 let currentDateMinusOne;
 // API
 const API_KEY = 'dviGmZuftX3h7VNSS2UVxZ1M7AfjXEQRTTQVoMhes28TPZETMMXENDJ%2FT60N5MkIHuZGTVGLZqYBfbZTwGUPUw%3D%3D'
@@ -181,8 +177,14 @@ function formatDate(date) {
 
   return `${year}${month}${day}`;
 }
+function reloadPopup(load, setReload) {
+  console.log('reload')
+  if (load) {
+    setReload(true);
+  }
+}
 
-function Home({ vilageFcstMapData, midFcstMapData }) {
+function Home({ vilageFcstMapData, midFcstMapData, geolocation }) {
   const [ultraSrtFcstData, setUltraSrtFcstData] = useState(); // 초단기예보 
   const [vilageFcstDaily, setVilageFcstDaily] = useState(); // 단기예보 
   const [weeklyData, setWeeklyData] = useState({
@@ -208,19 +210,40 @@ function Home({ vilageFcstMapData, midFcstMapData }) {
   const [timeSessionSKYData, setTimeSessionSKYData] = useState([]);
   const [updateTime, setUpdateTime] = useState('');
   const [currentLocation, setCurrentLocation] = useState({});
+  const [siteCount, setSiteCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [reload, setReload] = useState(false);
+
+  const setTime = useRef('');
 
   useEffect(() => {
-    if (vilageTime < "0600") { // 06시 이전일 때
+    if (currentTime < "0600") { // 06시 이전일 때
       const yesterdayDate = getYesterdayDate();
       const yesterdayDateFormatted = formatDate(yesterdayDate);
       currentDateMinusOne = yesterdayDateFormatted;
     }
     // currentDateMinusOne = currentDate;
     // 주간 최신화 시간
-    const previousUpdateTime = findPreviousUpdateTime(vilageUpdateTime, vilageTime);
+    const previousUpdateTime = findPreviousUpdateTime(vilageUpdateTime, currentTime);
     console.log('previousUpdateTime', previousUpdateTime)
     setUpdateTime(previousUpdateTime);
+
+    // AOS 실행
+    AOS.init();
   }, [])
+  
+  // 응답시간
+  useEffect(() => {
+    // console.log('siteCount', siteCount)
+    if (siteCount === 0) {
+      setTime.current = setTimeout(reloadPopup, 5000, loading, setReload);
+    }
+    if (siteCount !== 4) return;
+    else {
+      clearTimeout(setTime.current);
+      setLoading(false);
+    }
+  }, [siteCount])
   
   // 현재위치
   useEffect(() => {
@@ -262,9 +285,9 @@ function Home({ vilageFcstMapData, midFcstMapData }) {
       .then((result) => {
         res2 = JSON.parse(result).response.body.items.item;
         setVilageFcstDaily(res2);
-        return result + 1;
+        return;
       })
-    GetSecond_weatherState_API(API_KEY, currentDate, currentLocation[0]) //3
+    GetSecond_weatherState_API(API_KEY, currentDate, currentLocation[0], currentTime, currentDateMinusOne) //3
       .then((resolve) => {
         let data = JSON.parse(resolve).response.body.items.item;
         setDailyState({
@@ -272,7 +295,7 @@ function Home({ vilageFcstMapData, midFcstMapData }) {
         })
         return;
       })
-    GetThird_temperature_API(API_KEY, currentDate, currentLocation[0], midFcstMapData) //4
+    GetThird_temperature_API(API_KEY, currentDate, currentLocation[0], midFcstMapData, currentTime, currentDateMinusOne) //4
       .then((resolve) => {
         let data = JSON.parse(resolve).response.body.items.item;
         setWeeklyData({
@@ -303,6 +326,7 @@ function Home({ vilageFcstMapData, midFcstMapData }) {
       sky: getSky(filteredData), // 하늘
       baseData: filteredData[0],
     })
+    setSiteCount(siteCount+1);
   }, [filteredData])
 
   useEffect(() => { // 공기상태
@@ -322,9 +346,9 @@ function Home({ vilageFcstMapData, midFcstMapData }) {
       .then((res) => {
         let data = JSON.parse(res).response.body.items;
         setAirCondition([data[0]])
+        setSiteCount(siteCount+1);
         // console.log('-------------------------', data)
       })
-
   }, [mainSec])
 
   // 사용 데이터 추출
@@ -382,6 +406,7 @@ function Home({ vilageFcstMapData, midFcstMapData }) {
       ...dailyState,
       twoDays: justTwoDays,
     })
+    setSiteCount(siteCount+1);
   }, [vilageFcstDaily])
   useEffect(() => { // 당일 최저온도 생성/11:00이후 데이터 갱신
     if (!mainSec.highTemp) return;
@@ -392,7 +417,8 @@ function Home({ vilageFcstMapData, midFcstMapData }) {
           ...mainSec,
           lowTemp: getLowTemp(res),
         })
-    })
+      })
+      setSiteCount(siteCount+1);
     if (currentTime < '1400') return;
     getSecondAPI_temp(API_KEY, currentDate, currentLocation[0], updateTime) //2_2
       .then((result) => {
@@ -404,22 +430,26 @@ function Home({ vilageFcstMapData, midFcstMapData }) {
         })
     })
   }, [mainSec.highTemp])
-  // console.log('weeklyData', weeklyData)
-
-  // 현재 시간 받아오면서 자동 새로고침, 수동 새로고침 버튼 삽입
+  // console.log('timeSessionTMPData', timeSessionTMPData, 'timeSessionSKYData', timeSessionSKYData);
+  // console.log('weeklyData', weeklyData, 'dailyState', dailyState)
+  // console.log('siteCount', siteCount, 'siteCount')
   UseTitle('오늘의 날씨');
 
   return (
     <>
-      <div className="Home_wrap">
-          <Site1 data={mainSec} />
-          <div className="site_wrap">
-            <Site2 temperature={timeSessionTMPData} sky={timeSessionSKYData} time={currentTime} />
-            <Site3 data={weeklyData} weatherState={dailyState} currentDate={currentDate} />
-            <Site4 data={airCondition} />
-            <Site5 data={ultraSrtFcstData} currentTime={currentTime} />
-          </div>
-      </div>
+      {
+        loading ? reload ? <p className='msg'>응답시간 초과, 새로고침을 눌러주세요</p> :
+        <p className='msg'>날씨 정보 가져오는 중..</p> : 
+        <div className="Home_wrap">
+            <Site1 data={mainSec} />
+            <div className="site_wrap" data-aos="fade-up" data-aos-delay="500">
+              <Site2 temperature={timeSessionTMPData} sky={timeSessionSKYData} time={currentTime} />
+              <Site3 data={weeklyData} weatherState={dailyState} currentDate={currentDate} />
+              <Site4 data={airCondition} />
+              <Site5 data={ultraSrtFcstData} currentTime={currentTime} />
+            </div>
+        </div>
+      }
     </>
   )
 }

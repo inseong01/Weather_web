@@ -14,7 +14,7 @@ const gangwondoCode = [
   {key: "강원도영서", value: "영월, 평창, 정선, 화천, 양구"},
   {key: "강원도영동", value: "원주, 강릉, 동해, 삼척, 태백"},
 ]
-const GetSecond_weatherState_API = (key, currentDate, currentLocation) => { // 1일 2회(06, 18) 중기육상예보
+const GetSecond_weatherState_API = (key, currentDate, currentLocation, currentTime, yesterday) => { // 1일 2회(06, 18) 중기육상예보
   let regId;
   let firstLocation = currentLocation["1단계"].replace(/[도광역시특별자치시특별시]/, '');
   let secondLocation = currentLocation["2단계"].replace(/[군시]/, '');
@@ -24,7 +24,8 @@ const GetSecond_weatherState_API = (key, currentDate, currentLocation) => { // 1
   } else {
     regId = locationCode.filter(code => code.value.includes(firstLocation))[0].key;
   }
-  // console.log('firstLocation', firstLocation, 'regId', regId)
+  let tmFc = currentTime < "0600" ? yesterday + '1800' : currentDate + '0600';
+  // console.log('tmFc1', tmFc)
 
   return new Promise((resolev, reject) => {
     let xhr = new XMLHttpRequest();
@@ -34,7 +35,7 @@ const GetSecond_weatherState_API = (key, currentDate, currentLocation) => { // 1
     queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10');
     queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('JSON');
     queryParams += '&' + encodeURIComponent('regId') + '=' + encodeURIComponent(`${regId}`); // 지역ID
-    queryParams += '&' + encodeURIComponent('tmFc') + '=' + encodeURIComponent(`${currentDate}0600`);
+    queryParams += '&' + encodeURIComponent('tmFc') + '=' + encodeURIComponent(`${tmFc}`);
   
     xhr.open('GET', url + queryParams, true);  // 비동기 요청을 위해 true로 설정
   

@@ -1,10 +1,12 @@
-const GetThird_temperature_API = (key, currentDate, currentLocation, midFcstMapData) => { // 1일 2회(06, 18) 중기기온예보
+const GetThird_temperature_API = (key, currentDate, currentLocation, midFcstMapData, currentTime, yesterday) => { // 1일 2회(06, 18) 중기기온예보
   let regId;
   let secondLc = currentLocation["2단계"].split(/[시군]/)[0]; // ["~시", "~구"]
   for (let i = 0; i < midFcstMapData.length; i++) {
     if (!midFcstMapData[i]["지역"].includes(secondLc)) continue;
     regId = midFcstMapData[i]["코드"];
   }
+  let tmFc = currentTime < "0600" ? yesterday + '1800' : currentDate + '0600';
+  // console.log('tmFc2', tmFc)
   
   return new Promise((resolev, reject) => {
     let xhr = new XMLHttpRequest();
@@ -14,7 +16,7 @@ const GetThird_temperature_API = (key, currentDate, currentLocation, midFcstMapD
     queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10');
     queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('JSON');
     queryParams += '&' + encodeURIComponent('regId') + '=' + encodeURIComponent(`${regId}`); // 지역ID
-    queryParams += '&' + encodeURIComponent('tmFc') + '=' + encodeURIComponent(`${currentDate}0600`);
+    queryParams += '&' + encodeURIComponent('tmFc') + '=' + encodeURIComponent(`${tmFc}`);
   
     xhr.open('GET', url + queryParams, true);  // 비동기 요청을 위해 true로 설정
   

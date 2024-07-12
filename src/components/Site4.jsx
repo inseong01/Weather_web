@@ -107,7 +107,7 @@ export default function Site4({ data }) {
 
   return (
     <>
-      <div className="site4">
+      <div className="site4" >
         <div className="item_box_wrap">
             <div className="item_box">
               <p className="title">미세먼지</p>

@@ -1,10 +1,17 @@
 import { useEffect, useState } from 'react';
 import './App.css'
 import Home from './Page/Home'
+import GetGeolocation from './functions/getGeolocation'
+import AppMsg from './components/appMsg';
+
+// geoLocation
+const geolocationArr = GetGeolocation(); // [위도_d, 위도_f, 경도_d, 경도_f]
+// const geolocationArr = '' // 
 
 function App() {
   const [vilageFcstMapData, setVilageFcstMapData] = useState('');
   const [midFcstMapData, setMidFcstMapData] = useState('');
+  const [geolocation, setGeolacation] = useState('');
 
   const onChangeInput = (e) => { // 엑셀 파일 업로드
     const files = e.target.files;
@@ -40,14 +47,23 @@ function App() {
     setVilageFcstMapData(JSON.parse(vilageFcstMapData));
     setMidFcstMapData(JSON.parse(midFcstMapData));
   }, [])
-
+  
+  useEffect(() => {
+    if (!geolocationArr) return;
+    console.log(geolocation)
+    setGeolacation(geolocationArr);
+  }, [geolocation])
+  
   return (
     <>
       <div className="fileLoad_wrap">
         <input type="file" className='upload' onChange={onChangeInput} multiple />
         <button className="loadData" onClick={onClickInput}>업로드</button>
       </div>
-      <Home vilageFcstMapData={vilageFcstMapData} midFcstMapData={midFcstMapData} />
+      {
+        !geolocation ? <AppMsg /> :
+        <Home vilageFcstMapData={vilageFcstMapData} midFcstMapData={midFcstMapData} geolocation={geolocation}/> 
+      }
     </>
   )
 }

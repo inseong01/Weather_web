@@ -17,7 +17,8 @@ input:focus {
 }
 
 #root {
-  min-height: auto;
+  width: 100%;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -61,4 +62,23 @@ ul, li, ol {
   border: 1px solid #222;
   color: white;
   /* background-color: transparent; */
+}
+
+.msg {
+  color: #f2f2f2;
+  font-size: 1.5rem;
+  animation: opc 1.5s both;
+  text-align: center;
+}
+@keyframes opc {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.sub_msg {
+  font-size: 14px;
+  margin-top: 6px;
 }
