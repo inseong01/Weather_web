@@ -3,7 +3,7 @@ const GetXY_Position_API = (key, data) => { // local = '읍면동'
   // console.log(location)
   return new Promise((resolev, reject) => {
     var xhr = new XMLHttpRequest();
-    var url = 'http://apis.data.go.kr/B552584/MsrstnInfoInqireSvc/getTMStdrCrdnt'; /*URL*/
+    var url = 'https://apis.data.go.kr/B552584/MsrstnInfoInqireSvc/getTMStdrCrdnt'; /*URL*/
     var queryParams = '?' + encodeURIComponent('serviceKey') + '='+`${key}`; /*Service Key*/
     queryParams += '&' + encodeURIComponent('returnType') + '=' + encodeURIComponent('json'); /**/
     queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('3'); /**/

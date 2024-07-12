@@ -4,7 +4,7 @@ function getFirstAPI(API_KEY, currentDate, currentTime, currentLocation) { // 1ì
 
   return new Promise((resolve, reject) => {
     var xhr1 = new XMLHttpRequest();
-    var url1 = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst'; 
+    var url1 = 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst'; 
     /* URL */
     var queryParams = '?' + encodeURIComponent('serviceKey') + '=' + `${API_KEY}`; 
     /* Service Key */

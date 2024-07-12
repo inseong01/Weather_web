@@ -28,7 +28,7 @@
 <br />  
 
 ## 개선사항
-...
+- getCurrentPosition, forEach 오류
 <br />  
 
 # 2. 느낀점   

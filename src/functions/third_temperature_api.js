@@ -10,7 +10,7 @@ const GetThird_temperature_API = (key, currentDate, currentLocation, midFcstMapD
   
   return new Promise((resolev, reject) => {
     let xhr = new XMLHttpRequest();
-    let url = 'http://apis.data.go.kr/1360000/MidFcstInfoService/getMidTa'; 
+    let url = 'https://apis.data.go.kr/1360000/MidFcstInfoService/getMidTa'; 
     let queryParams = '?' + encodeURIComponent('serviceKey') + '=' + `${key}`; 
     queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1');
     queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10');

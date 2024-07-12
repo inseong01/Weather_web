@@ -2,7 +2,7 @@ const GetStaionName_API = (key, [data]) => {
   // console.log('GetStaionName_API', data)
   return new Promise((resolev, reject) => {
     var xhr = new XMLHttpRequest();
-    var url = 'http://apis.data.go.kr/B552584/MsrstnInfoInqireSvc/getNearbyMsrstnList'; /*URL*/
+    var url = 'https://apis.data.go.kr/B552584/MsrstnInfoInqireSvc/getNearbyMsrstnList'; /*URL*/
     var queryParams = '?' + encodeURIComponent('serviceKey') + '='+`${key}`; /*Service Key*/
     queryParams += '&' + encodeURIComponent('returnType') + '=' + encodeURIComponent('json'); /**/
     queryParams += '&' + encodeURIComponent('tmX') + '=' + encodeURIComponent(data.tmX); /**/

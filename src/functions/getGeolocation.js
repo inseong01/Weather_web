@@ -1,6 +1,7 @@
 const success = (props) => { // 허용
   let latitude = props.coords.latitude; // 위도
   let longitude = props.coords.longitude; // 경도
+  console.log('success', latitude, longitude);
   return [latitude.toFixed(6), longitude.toFixed(6)];
 }
 const error = () => { // 거부

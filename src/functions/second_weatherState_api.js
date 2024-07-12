@@ -29,7 +29,7 @@ const GetSecond_weatherState_API = (key, currentDate, currentLocation, currentTi
 
   return new Promise((resolev, reject) => {
     let xhr = new XMLHttpRequest();
-    let url = 'http://apis.data.go.kr/1360000/MidFcstInfoService/getMidLandFcst'; 
+    let url = 'https://apis.data.go.kr/1360000/MidFcstInfoService/getMidLandFcst'; 
     let queryParams = '?' + encodeURIComponent('serviceKey') + '=' + `${key}`; 
     queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1');
     queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10');
