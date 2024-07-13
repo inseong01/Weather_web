@@ -184,7 +184,7 @@ function reloadPopup(load, setReload) {
   }
 }
 
-function Home({ vilageFcstMapData, midFcstMapData, geolocation }) {
+function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes }) {
   const [ultraSrtFcstData, setUltraSrtFcstData] = useState(); // 초단기예보 
   const [vilageFcstDaily, setVilageFcstDaily] = useState(); // 단기예보 
   const [weeklyData, setWeeklyData] = useState({
@@ -213,8 +213,10 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation }) {
   const [siteCount, setSiteCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(false);
-
+  const [pageError, setPageError] = useState(false);
+  const [airConditionError, setAirConditionError] = useState(false);
   const setTime = useRef('');
+
 
   useEffect(() => {
     if (currentTime < "0600") { // 06시 이전일 때
@@ -267,6 +269,7 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation }) {
     if (!currentLocation[0]) return;    
     let res1;
     let res2;
+    try {
     GetFirstAPI(API_KEY, currentDate, currentTime, currentLocation[0]) //1
       .then((resolve) => {
         // console.log('resolve', resolve)
@@ -304,6 +307,9 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation }) {
         })
         return;
       })
+    } catch(error) {
+      setPageError(true);
+    }
   }, [currentLocation])
   // console.log('airCondition', !airCondition[0].PM10)
 
@@ -331,24 +337,33 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation }) {
 
   useEffect(() => { // 공기상태
     if (!mainSec.local || mainSec.highTemp) return;
-    GetXY_Position_API(API_KEY, mainSec.local.replace(/\d/g, ''))
-      .then((res) => { // tmX, tmY 좌표 계산
-        // console.log(0, res)
-        let data = JSON.parse(res).response.body.items; 
-        // [{sggName: '고양시 일산서구', umdName: '덕이동', tmX: '177349.530865', tmY: '465945.611074', sidoName: '경기도'}]
-        return GetStaionName_API(API_KEY, data.flat());
-      })
-      .then((resolve) => { // 측정소 검색
-        let data = JSON.parse(resolve).response.body.items;
-        // console.log('data3', data[0])
-        return GetForth_airConditionValue_API(API_KEY, data[0]) //6;
-      })
-      .then((res) => {
-        let data = JSON.parse(res).response.body.items;
-        setAirCondition([data[0]])
-        setSiteCount(siteCount+1);
-        // console.log('-------------------------', data)
-      })
+      GetXY_Position_API(API_KEY, mainSec.local.replace(/\d.,/g, ''))
+        .then((res) => { // tmX, tmY 좌표 계산
+          let data = JSON.parse(res).response.body.items; 
+          // [{sggName: '고양시 일산서구', umdName: '덕이동', tmX: '177349.530865', tmY: '465945.611074', sidoName: '경기도'}]
+          return GetStaionName_API(API_KEY, data.flat());
+        })
+        .then((resolve) => { // 측정소 검색
+          let data = JSON.parse(resolve).response.body.items;
+          // 측정소가 있어도 값이 없을 수 있음 (totalCount = 0)
+          return GetForth_airConditionValue_API(API_KEY, data[0]) //6;
+        })
+        .then((res) => {
+          let data = JSON.parse(res).response.body.items;
+          if (!data[0]) {
+            setAirConditionError(true);
+            setSiteCount(siteCount+1);
+            return;
+          }
+          setAirCondition([data[0]])
+          setSiteCount(siteCount+1);
+          // console.log('-------------------------', data)
+        })
+        .catch((e) => {
+          console.log('erroe', e)
+          setAirConditionError(true);
+          setSiteCount(siteCount+1);
+        })
   }, [mainSec])
 
   // 사용 데이터 추출
@@ -410,42 +425,46 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation }) {
   }, [vilageFcstDaily])
   useEffect(() => { // 당일 최저온도 생성/11:00이후 데이터 갱신
     if (!mainSec.highTemp) return;
-    getSecondAPI_lowtemp(API_KEY, currentDate, currentLocation[0], '', 50) //2_2
-      .then((result) => {
-        let res = JSON.parse(result).response.body.items.item;
-        setMainSec({
-          ...mainSec,
-          lowTemp: getLowTemp(res),
+    try {
+      getSecondAPI_lowtemp(API_KEY, currentDate, currentLocation[0], '', 50) //2_2
+        .then((result) => {
+          let res = JSON.parse(result).response.body.items.item;
+          setMainSec({
+            ...mainSec,
+            lowTemp: getLowTemp(res),
+          })
         })
+        setSiteCount(siteCount+1);
+      if (currentTime < '1400') return;
+      getSecondAPI_temp(API_KEY, currentDate, currentLocation[0], updateTime) //2_2
+        .then((result) => {
+          let res = JSON.parse(result).response.body.items.item;
+          let arr = filteringVilageFcstDaily(res, currentDate, currentTime);
+          setWeeklyData({
+            ...weeklyData,
+            before: arr[0],
+          })
       })
+    } catch(error) {
+      if (pageError) return;
+      setPageError(true);
       setSiteCount(siteCount+1);
-    if (currentTime < '1400') return;
-    getSecondAPI_temp(API_KEY, currentDate, currentLocation[0], updateTime) //2_2
-      .then((result) => {
-        let res = JSON.parse(result).response.body.items.item;
-        let arr = filteringVilageFcstDaily(res, currentDate, currentTime);
-        setWeeklyData({
-          ...weeklyData,
-          before: arr[0],
-        })
-    })
+    }
   }, [mainSec.highTemp])
-  // console.log('timeSessionTMPData', timeSessionTMPData, 'timeSessionSKYData', timeSessionSKYData);
-  // console.log('weeklyData', weeklyData, 'dailyState', dailyState)
-  // console.log('siteCount', siteCount, 'siteCount')
+
   UseTitle('오늘의 날씨');
 
   return (
     <>
       {
-        loading ? reload ? <p className='msg'>응답시간 초과, 새로고침을 눌러주세요</p> :
+        loading ? reload ? <p className='msg'>{pageError ? `API 문제` : `응답시간 초과`}, 새로고침을 눌러주세요</p> :
         <p className='msg'>날씨 정보 가져오는 중..</p> : 
         <div className="Home_wrap">
-            <Site1 data={mainSec} />
+            <Site1 data={mainSec} geolocationRes={geolocationRes} />
             <div className="site_wrap" data-aos="fade-up" data-aos-delay="500">
               <Site2 temperature={timeSessionTMPData} sky={timeSessionSKYData} time={currentTime} />
               <Site3 data={weeklyData} weatherState={dailyState} currentDate={currentDate} />
-              <Site4 data={airCondition} />
+              <Site4 data={airCondition} airConditionError={airConditionError} />
               <Site5 data={ultraSrtFcstData} currentTime={currentTime} />
             </div>
         </div>

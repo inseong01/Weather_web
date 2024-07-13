@@ -1,17 +1,25 @@
 import { useEffect, useState } from 'react';
 import './App.css'
 import Home from './Page/Home'
-import GetGeolocation from './functions/getGeolocation'
 import AppMsg from './components/appMsg';
+import geolocationCalculator from './functions/geolocationCalculator';
 
 // geoLocation
-const geolocationArr = GetGeolocation(); // [위도_d, 위도_f, 경도_d, 경도_f]
-// const geolocationArr = '' // 
+let defaultGeoloacation;
+let currentGeoloacation;
+const options = {
+  enableHighAccuracy: true,
+  maximumAge: 30000,
+  timeout: 27000,
+};
+
 
 function App() {
   const [vilageFcstMapData, setVilageFcstMapData] = useState('');
   const [midFcstMapData, setMidFcstMapData] = useState('');
-  const [geolocation, setGeolacation] = useState('');
+  const [geolocationSuccessRes, setGeolacationSuccessRes] = useState(undefined);
+  const [geolocationRejectRes, setGeolacationRejectRes] = useState(undefined);
+  const [geolocation, setGeolacation] = useState(undefined);
 
   const onChangeInput = (e) => { // 엑셀 파일 업로드
     const files = e.target.files;
@@ -46,13 +54,31 @@ function App() {
     const midFcstMapData = localStorage.getItem('midFcstMapData');
     setVilageFcstMapData(JSON.parse(vilageFcstMapData));
     setMidFcstMapData(JSON.parse(midFcstMapData));
+
+    // geoLocation
+    const success = (e) => { // 허용
+      let latitude = e.coords.latitude.toFixed(6); // 위도
+      let longitude = e.coords.longitude.toFixed(6); // 경도
+      currentGeoloacation = ['success', [latitude, longitude]];
+      setGeolacationSuccessRes(currentGeoloacation);
+      // console.log('success', currentGeoloacation);
+    }
+    const error = () => { // 거부
+      let latitude = 36.604528; // 위도
+      let longitude = 127.298399; // 경도
+      defaultGeoloacation = ['error', [latitude.toFixed(6), longitude.toFixed(6)]]; // 종로 청운효자동
+      setGeolacationRejectRes(defaultGeoloacation);
+      // console.log('getGeolocationo set default');
+    }
+    navigator.geolocation.getCurrentPosition(success, error, options);
   }, [])
   
   useEffect(() => {
-    if (!geolocationArr) return;
-    console.log(geolocation)
-    setGeolacation(geolocationArr);
-  }, [geolocation])
+    if (!geolocationSuccessRes && !geolocationRejectRes) return;
+    let res = geolocationSuccessRes || geolocationRejectRes; // ["success", [위도, 경도]]
+    let geolocationArr = geolocationCalculator(res[1]); // [위도_d, 위도_f, 경도_d, 경도_f]
+    setGeolacation([res[0], geolocationArr]);
+  }, [geolocationSuccessRes, geolocationRejectRes])
   
   return (
     <>
@@ -62,7 +88,7 @@ function App() {
       </div>
       {
         !geolocation ? <AppMsg /> :
-        <Home vilageFcstMapData={vilageFcstMapData} midFcstMapData={midFcstMapData} geolocation={geolocation}/> 
+        <Home vilageFcstMapData={vilageFcstMapData} midFcstMapData={midFcstMapData} geolocation={geolocation[1]} geolocationRes={geolocation[0]} /> 
       }
     </>
   )

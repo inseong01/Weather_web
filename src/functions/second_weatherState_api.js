@@ -16,8 +16,8 @@ const gangwondoCode = [
 ]
 const GetSecond_weatherState_API = (key, currentDate, currentLocation, currentTime, yesterday) => { // 1일 2회(06, 18) 중기육상예보
   let regId;
-  let firstLocation = currentLocation["1단계"].replace(/[도광역시특별자치시특별시]/, '');
-  let secondLocation = currentLocation["2단계"].replace(/[군시]/, '');
+  let firstLocation = currentLocation["1단계"].replace(/[도광역시특별시특별자치시]/g, ''); // 특별시 특별자치시 인식오류, 'g' 모두 처리
+  let secondLocation = currentLocation["2단계"].replace(/[구군특별시특별자치시]/g, '');
   if (firstLocation.includes('강원')) {
     let gangwondoLc = gangwondoCode.filter(code => code.value.includes(secondLocation));
     regId = locationCode.filter(code => code.value.includes(gangwondoLc))[0].key; // {key, value}
