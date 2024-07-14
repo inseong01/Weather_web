@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import AirconditionCalculator from "../functions/AirconditionCalculator";
 
 const airCategories = [
   "pm10", "pm25", "o3"
@@ -35,7 +36,7 @@ const calculateAirQualityIndexCSS = (grade, value) => {
   return cssValueBox;
 }
 
-const getData = ([ data ]) => { 
+const getData = ([ data ], setStationError) => { 
   let returnData = [];
   let airValue = [];
   let airGrade = [];
@@ -47,13 +48,13 @@ const getData = ([ data ]) => {
       if (i.includes("Value")) {
         let value = {
           key: i,
-          value: data[i] || '측정오류'
+          value: data[i] || setStationError(true)
         }
         airValue.push(value);
       } else {
         let grade = {
           key: i,
-          grade: airCategoriesGrade[data[i]] || airGrade[0]
+          grade: airCategoriesGrade[data[i]] || AirconditionCalculator(i, data)
         }
         airGrade.push(grade);
       }
@@ -63,9 +64,13 @@ const getData = ([ data ]) => {
   // console.log('returnData', returnData);
   return returnData; // [[{key: , value: }], [...]]
 }
+const checkStationError = (data, setStationError) => {
+  let stationState = Object.values(data).includes('통신장애');
+  setStationError(stationState);
+}
 
 /* eslint-disable */
-export default function Site4_item_box({ data }) {
+export default function Site4_item_box({ data, setStationError }) {
   const [airState, setAirState] = useState({
     value: "",
     grade: ""
@@ -76,8 +81,10 @@ export default function Site4_item_box({ data }) {
   useEffect(() => { // data === [{...}]
     // console.log('data', data[0])
     if (!data[0]) return;
+    // 측정소 통신상태 확인
+    checkStationError(data[0], setStationError);
     // 미세먼지 상태
-    const airConditionState = getData(data);
+    const airConditionState = getData(data, setStationError);
     setAirState([ 
       airConditionState[0],
       airConditionState[1],
@@ -99,7 +106,7 @@ export default function Site4_item_box({ data }) {
       calculateAirQualityIndexCSS(airState[1][1].grade, airState[0][1].value),
     ])
   }, [airState])
-  // console.log('pm10', pm10, 'pm20', pm20)
+  // console.log('data', data);
 
   // 수치값에 따라서 bar 그래프 길이 달라짐, 수치에 따라서 색 또한 달라짐
   // 수치값 기준 pm10 >> 0-30, 31-80, 81-150, 151- 

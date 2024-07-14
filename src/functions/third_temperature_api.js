@@ -2,12 +2,13 @@ const GetThird_temperature_API = (key, currentDate, currentLocation, midFcstMapD
   let regId;
   let firstLc = currentLocation["1단계"].split(/[도특별시특별자치시광역시]/g)[0];
   let secondLc = currentLocation["2단계"].split(/[시군구특별자치시]/g)[0];
+  secondLc = secondLc.length !== 1 ? secondLc : secondLc + '구';
   for (let i = 0; i < midFcstMapData.length; i++) {
     if (!midFcstMapData[i]["지역"].includes(firstLc) && !midFcstMapData[i]["지역"].includes(secondLc)) continue;
     regId = midFcstMapData[i]["코드"];
   }
   let tmFc = currentTime < "0600" ? yesterday + '1800' : currentDate + '0600';
-  console.log('tmFc2', regId, secondLc, firstLc)
+  // console.log('tmFc2', regId, firstLc, secondLc);
   
   return new Promise((resolev, reject) => {
     let xhr = new XMLHttpRequest();

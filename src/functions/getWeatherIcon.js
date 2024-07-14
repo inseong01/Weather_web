@@ -19,7 +19,7 @@ const getWeatherIconName = (skyCode, ptyCode) => {
       console.log('ptyCode error')
       return;
   }
-  return `url(public/img/${name}.png)`;
+  return `url(/img/${name}.png)`;
 }
 
 export default getWeatherIconName;

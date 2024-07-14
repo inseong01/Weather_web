@@ -1,6 +1,6 @@
 const GetXY_Position_API = (key, data) => { // local = '읍면동'
-  let location = data.split(' ')[1]
-  // console.log(data, location)
+  let location = data.split(' ')[1];
+  // console.log(data, location);
   return new Promise((resolev, reject) => {
     var xhr = new XMLHttpRequest();
     var url = 'https://apis.data.go.kr/B552584/MsrstnInfoInqireSvc/getTMStdrCrdnt'; /*URL*/
