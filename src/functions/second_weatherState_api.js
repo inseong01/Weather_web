@@ -11,21 +11,22 @@ const locationCode = [
   {key: "11G00000",	value: "제주도"}
 ]
 const gangwondoCode = [
-  {key: "강원도영서", value: "영월, 평창, 정선, 화천, 양구"},
-  {key: "강원도영동", value: "원주, 강릉, 동해, 삼척, 태백"},
+  {key: "강원도영서", value: "원주 춘천 홍천 횡성 영월 평창 정선 양구 인제 화천 철원"},
+  {key: "강원도영동", value: "강릉, 동해, 속초, 삼척, 태백, 양양, 고성"},
 ]
 const GetSecond_weatherState_API = (key, currentDate, currentLocation, currentTime, yesterday) => { // 1일 2회(06, 18) 중기육상예보
   let regId;
   let firstLocation = currentLocation["1단계"].replace(/[도광역시특별시특별자치시]/g, ''); // 특별시 특별자치시 인식오류, 'g' 모두 처리
   let secondLocation = currentLocation["2단계"].replace(/[구군특별시특별자치시]/g, '');
+  secondLocation = secondLocation.length !== 1 ? secondLocation : secondLocation + '구';
   if (firstLocation.includes('강원')) {
     let gangwondoLc = gangwondoCode.filter(code => code.value.includes(secondLocation));
-    regId = locationCode.filter(code => code.value.includes(gangwondoLc))[0].key; // {key, value}
+    console.log('tmFc1', regId, firstLocation, secondLocation);
+    regId = locationCode.filter(code => code.value.includes(gangwondoLc[0].key))[0].key; // {key, value}
   } else {
     regId = locationCode.filter(code => code.value.includes(firstLocation))[0].key;
   }
   let tmFc = currentTime < "0600" ? yesterday + '1800' : currentDate + '0600';
-  // console.log('tmFc1', tmFc)
 
   return new Promise((resolev, reject) => {
     let xhr = new XMLHttpRequest();

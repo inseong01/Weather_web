@@ -214,7 +214,7 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes }
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(false);
   const [pageError, setPageError] = useState(false);
-  const [airConditionError, setAirConditionError] = useState(false);
+  const [stationNotFound, setStationNotFound] = useState(false);
   const setTime = useRef('');
 
 
@@ -227,7 +227,7 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes }
     // currentDateMinusOne = currentDate;
     // 주간 최신화 시간
     const previousUpdateTime = findPreviousUpdateTime(vilageUpdateTime, currentTime);
-    console.log('previousUpdateTime', previousUpdateTime)
+    // console.log('previousUpdateTime', previousUpdateTime);
     setUpdateTime(previousUpdateTime);
 
     // AOS 실행
@@ -253,9 +253,10 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes }
     let selectedLocations = []; // [{단기예보 엑셀 행}, {...}, ...]
     for (let i = 0; i < vilageFcstMapData.length; i++) {
       if (
+        +vilageFcstMapData[i]["위도(시)"] !== geolocation[0] ||
         +vilageFcstMapData[i]["경도(시)"] !== geolocation[2] ||
-        +vilageFcstMapData[i]["경도(분)"] !== geolocation[3] ||
-        +vilageFcstMapData[i]["위도(분)"] !== geolocation[1] 
+        +vilageFcstMapData[i]["위도(분)"] !== geolocation[1] ||
+        +vilageFcstMapData[i]["경도(분)"] !== geolocation[3] 
       ) continue;
       // console.log('vilageFcstMapData', vilageFcstMapData[i]);
       selectedLocations.push(vilageFcstMapData[i]);
@@ -308,6 +309,7 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes }
         return;
       })
     } catch(error) {
+      console.log('API', error)
       setPageError(true);
     }
   }, [currentLocation])
@@ -335,9 +337,10 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes }
     setSiteCount(siteCount+1);
   }, [filteredData])
 
-  useEffect(() => { // 공기상태
+  // 공기상태
+  useEffect(() => { 
     if (!mainSec.local || mainSec.highTemp) return;
-      GetXY_Position_API(API_KEY, mainSec.local.replace(/\d.,/g, ''))
+      GetXY_Position_API(API_KEY, mainSec.local.replace(/[\d\d,\d.]/g, ''))
         .then((res) => { // tmX, tmY 좌표 계산
           let data = JSON.parse(res).response.body.items; 
           // [{sggName: '고양시 일산서구', umdName: '덕이동', tmX: '177349.530865', tmY: '465945.611074', sidoName: '경기도'}]
@@ -351,7 +354,7 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes }
         .then((res) => {
           let data = JSON.parse(res).response.body.items;
           if (!data[0]) {
-            setAirConditionError(true);
+            setStationNotFound(true);
             setSiteCount(siteCount+1);
             return;
           }
@@ -361,7 +364,7 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes }
         })
         .catch((e) => {
           console.log('erroe', e)
-          setAirConditionError(true);
+          setStationNotFound(true);
           setSiteCount(siteCount+1);
         })
   }, [mainSec])
@@ -464,7 +467,7 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes }
             <div className="site_wrap" data-aos="fade-up" data-aos-delay="500">
               <Site2 temperature={timeSessionTMPData} sky={timeSessionSKYData} time={currentTime} />
               <Site3 data={weeklyData} weatherState={dailyState} currentDate={currentDate} />
-              <Site4 data={airCondition} airConditionError={airConditionError} />
+              <Site4 data={airCondition} stationNotFound={stationNotFound} />
               <Site5 data={ultraSrtFcstData} currentTime={currentTime} />
             </div>
         </div>

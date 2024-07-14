@@ -64,9 +64,9 @@ function App() {
       // console.log('success', currentGeoloacation);
     }
     const error = () => { // 거부
-      let latitude = 36.604528; // 위도
-      let longitude = 127.298399; // 경도
-      defaultGeoloacation = ['error', [latitude.toFixed(6), longitude.toFixed(6)]]; // 종로 청운효자동
+      let latitude = 37.6909130654328; // 위도
+      let longitude = 126.754305253403; // 경도
+      defaultGeoloacation = ['error', [latitude.toFixed(6), longitude.toFixed(6)]]; // 예) 종로 청운효자동
       setGeolacationRejectRes(defaultGeoloacation);
       // console.log('getGeolocationo set default');
     }

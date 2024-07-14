@@ -127,7 +127,7 @@ export default function Site3({ data, weatherState, currentDate }) { // data = [
     // console.log('twoDaysLaterWeather', twoDaysLaterWeather)
     setWeekWeatherArr(twoDaysWeather.concat(twoDaysLaterWeather));
   }, [weatherState])
-  // console.log('weekWeatherArr', weekWeatherArr)
+  // console.log('weekTempArr', weekTempArr);
   
   return (
     <>
