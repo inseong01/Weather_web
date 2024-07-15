@@ -35,7 +35,7 @@ let currentTime = getCurrentTime();
 let currentDate = new Date().toISOString().slice(0,10).replaceAll('-', '');
 let currentDateMinusOne;
 // API
-const API_KEY = 'dviGmZuftX3h7VNSS2UVxZ1M7AfjXEQRTTQVoMhes28TPZETMMXENDJ%2FT60N5MkIHuZGTVGLZqYBfbZTwGUPUw%3D%3D'
+const API_KEY = import.meta.env.VITE_API_KEY;
 
 // 코드 모음
 const ultraSrtFcstCategory = [ // 초단기예보
@@ -340,7 +340,7 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes }
   // 공기상태
   useEffect(() => { 
     if (!mainSec.local || mainSec.highTemp) return;
-      GetXY_Position_API(API_KEY, mainSec.local.replace(/[\d\d,\d.]/g, ''))
+      GetXY_Position_API(API_KEY, mainSec.local.replace(/[\d\d,\d.제]/g, ''))
         .then((res) => { // tmX, tmY 좌표 계산
           let data = JSON.parse(res).response.body.items; 
           // [{sggName: '고양시 일산서구', umdName: '덕이동', tmX: '177349.530865', tmY: '465945.611074', sidoName: '경기도'}]
