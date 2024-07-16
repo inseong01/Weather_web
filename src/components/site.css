@@ -171,6 +171,7 @@
 .site5 .title_wrap {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 .site5 .info_box {
   width: 15px;
@@ -209,4 +210,121 @@
 }
 .site5 .item_box_wrap:last-child {
   width: 100%;
+}
+
+@media (max-width: 1200px) {
+  body {
+    overflow-y: scroll;
+  }
+  #root {
+    height: auto;
+  }
+  .msg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    font-size: 16px;
+  }
+
+  .Home_wrap {
+    width: 100%;
+    height: 100%;
+    gap: 60px;
+    padding: 50px 100px 20px;
+  }
+
+  .first_site .title {
+    font-size: 24px;
+    margin-bottom: 2px;
+  }
+  .first_site .local {
+    font-size: 12px;
+  }
+  .first_site .temp {
+    font-size: 86px;
+    margin-bottom: 6px;
+  }
+  .first_site .tempSummary {
+    font-size: 14px;
+  }
+  .first_site .highLowtemp {
+    font-size: 16px;
+  }
+
+  .site2, .site3,
+  .site4, .site5 {
+    width: 100%;
+  }
+  .site2 .swiper {
+    margin-top: 25px;
+  }
+  .site2 .item_box {
+    gap: 4px;
+  }
+  .site2 .item_box .icon {
+    width: 30px;
+    height: 30px;
+  }
+  .site3 .item_box{
+    font-size: 18px;
+  }
+  .site3 .dayInfo_wrap {
+    width: 50%;
+  }
+  .site3 .item_box .icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .site4 .item_box .title {
+    font-size: 13px;
+  }
+  .site4 .item_box .value {
+    font-size: 18px;
+  }
+  .site4 .item_box_wrap {
+    height: auto;
+  }
+  .site4 .item_box .bar_wrap {
+    width: 50%;
+    gap: 30px;
+  }
+
+  .site5 .item_box_wrap {
+    width: calc(50% - 5px);
+  }
+  .site5 .title {
+    font-size: 14px;
+  }
+  .site5 .value {
+    font-size: 18px;
+    margin-top: 5px;
+  }
+  .site5 .info_box {
+    font-size: 9px;
+  }
+  .site5 .info {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 425px) {
+  .Home_wrap {
+    padding: 50px 10px 20px;
+  }
+  .site2 .swiper {
+    margin-top: 15px;
+  }
+  .site3 .dayInfo_wrap {
+    width: 70%;
+  }
+  .site4 .item_box .bar_wrap {
+    width: 80%;
+  }
+  .site5 .info {
+    font-size: 9px;
+    padding: 15px;
+  }
 }

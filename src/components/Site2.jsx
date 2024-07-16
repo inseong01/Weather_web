@@ -49,7 +49,15 @@ export default function Site2({ time, temperature, sky }) {
           <Swiper 
             className="swiper"
             spaceBetween={30} 
-            slidesPerView={5}
+            slidesPerView={4}
+            breakpoints={{
+              768: {
+                slidesPerView:4
+              },
+              1024: {
+                slidesPerView:5
+              }
+            }}
           >
             {
               timeArr.map((value, idx) => {
