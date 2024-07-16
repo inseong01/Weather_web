@@ -8,6 +8,8 @@ https://weather-hpf6hepju-inseongs-projects-ab5eeeed.vercel.app
 <br />
 
 # 1. 작업일자   
+07.16. - 모바일/태블릿 반응형 사이즈 추가
+
 07.15. - .xlsx, .json으로 변경
 
 07.14. - API 입력값 예외처리 
