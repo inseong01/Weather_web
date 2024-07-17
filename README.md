@@ -8,6 +8,8 @@ https://weather-web-drab.vercel.app/
 <br />
 
 # 1. 작업일자   
+07.17. - API 미작동 오류 수정, 공유 링크 섬네일 추가
+
 07.16. - 모바일/태블릿 반응형 사이즈 추가
 
 07.15. - .xlsx, .json으로 변경
