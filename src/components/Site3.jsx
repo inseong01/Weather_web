@@ -1,147 +1,39 @@
-/* eslint-disable */
-import { useEffect, useState } from 'react';
-import './site.css'
-import Site3_item_box from './Site3_item_box';
-import getWeatherIconName from '../functions/getWeatherIcon';
-import getWeatherIconNameTranslator from '../functions/getWeatherIconNameTranslator';
+import "./site.css";
+import Site3_item_box from "./Site3_item_box";
+import mergeWeekData from "../functions/mergeWeekData";
+import PropTypes from "prop-types";
+import getWeatherArr from "../functions/getWeatherArr";
 
-const keys =  [
-  'taMin1', 'taMax1', 'taMin2', 'taMax2', 'taMin3', 'taMax3', 
-  'taMin4', 'taMax4', 'taMin5', 'taMax5', 'taMin6', 'taMax6'
-];
+export default function Site3({ data, weatherState, currentDate }) {
+  // data = [{단기예보}, {주간최고/저온도}]
+  // 주간 기온 최저/최고 병합
+  const weekTempArr = mergeWeekData(data, currentDate);
+  // 주간 날씨 기온/아이콘
+  const weekWeatherArr = getWeatherArr(weatherState);
 
-const mergeWeekData = (data, currentDate) => {
-  let num = 0;
-  let weekArr = [];
-  const threeDaysBefore = [...data.before].filter(item => item.fcstDate !== currentDate).filter((item) => 
-    item.category === 'TMN' || item.category === 'TMX'
-  )
-
-  // 객체 변환
-  const resultArray = data.threeDaysLater.map(item => 
-    Object.entries(item).map(([key, value]) => ({ key, value }))
-  ).flat()
-  // console.log('data', data)
-  threeDaysBefore.map(item => {
-    if (item.category === 'TMN') {
-      item['key'] = `taMin${num}`;
-      item[`value`] = item.fcstValue;
-    } else if (item.category === 'TMX') {
-      item[`key`] = `taMax${num}`;
-      item[`value`] = item.fcstValue;
-      num++
-    }
-    weekArr.push(item)
-  })
-  // 정렬
-  let arr = weekArr.concat(resultArray).filter(value => 
-    /ta(Max|Min)\d*$/.test(value.key)
-  );
-  // console.log('arr', arr)
-  
-  // 합병
-  let collectTemp = [];
-  // console.log('arr', arr)
-  for (let i = 0; i < arr.length; i+=2) { // 오류나면 arr의 fcstDate 확인(16시 전 i=1, 이후 i=0, ???)
-    let mergeArr = [
-      Number(arr[i].value).toFixed(0),
-      Number(arr[i+1].value).toFixed(0),
-    ];
-    // console.log('min', Number(arr[i].value).toFixed(0))
-    // console.log('max', Number(arr[i+1].value).toFixed(0))
-    collectTemp.push(mergeArr) // [min, max]
-  }
-  // console.log('collectTemp', collectTemp)
-  return collectTemp.slice(0, 6);
-}
-const mergeWeatherTwoDays = (data) => {
-  let mergeBox = [];
-  for (let i = 0; i < data.length; i+=2) {
-    let box = [data[i], data[i+1]];
-    mergeBox.push(box);
-  }
-  let value = [];
-  let num = 1;
-  // console.log('mergeBox', mergeBox)
-  for (let i = 0; i < mergeBox.length; i+=2) { // length === 4
-    let name = [{
-      key: `wf${num}AM`, 
-      value: getWeatherIconName(+mergeBox[i][0].fcstValue, +mergeBox[i][1].fcstValue),
-      origin: [+mergeBox[i][0].fcstValue, +mergeBox[i][1].fcstValue],
-    },
-    {
-      key: `wf${num}PM`, 
-      value: getWeatherIconName(+mergeBox[i+1][0].fcstValue, +mergeBox[i+1][1].fcstValue),
-      origin: [+mergeBox[i+1][0].fcstValue, +mergeBox[i+1][1].fcstValue],
-    }];
-    value.push(name);
-    num++;
-  }
-  return value;
-}
-const getWeeklyMoistureData = (data) => {
-  let arr = [];
-  for (let i = 0; i < data.length; i++) {
-    if (data[i].category !== "REH") continue; // 다른 데이터 추출 시, 조건 추가
-    arr.push(data[i]);
-  }
-  return arr;
-}
-
-export default function Site3({ data, weatherState, currentDate }) { // data = [{단기예보}, {주간최고/저온도}]
-  const [weekTempArr, setWeekTempArr] = useState([]);
-  const [weekOtherData, setWeekOtherData] = useState([]);
-  const [weekWeatherArr, setWeekWeatherArr] = useState([]);
-
-  useEffect(() => {
-    if (!data.before.length) return;
-    // 주간 기온 최저/최고 병합
-    let mergedArr = mergeWeekData(data, currentDate);
-    setWeekTempArr(mergedArr);
-  }, [data])
-
-  useEffect(() => {
-    // console.log('weatherState', weatherState.twoDays)
-    if (!weatherState.twoDays) return;
-    // 주간 날씨 아이콘
-    let twoDaysWeather = mergeWeatherTwoDays(weatherState.twoDays);
-    let twoDaysLaterWeather = []; 
-    let box = [];
-    for (let i in weatherState.twoDaysLater[0]) { // [{...}]
-      if (i.includes('wf')) {
-        if (box.length > 1) {
-          twoDaysLaterWeather.push(box); // [{value}, {value}]
-          box = [];
-        }
-        let value = {
-          key: i,
-          value: getWeatherIconNameTranslator(weatherState.twoDaysLater[0][i]), // 함수적용
-          origin: weatherState.twoDaysLater[0][i]
-        }; 
-        box.push(value);
-        // console.log('i', i, weatherState.twoDaysLater[0][i]);
-        // console.log(getWeatherIconNameTranslator("흐리다 맑음이요"))
-      } 
-    }
-    // console.log('twoDaysWeather', twoDaysWeather)
-    // console.log('twoDaysLaterWeather', twoDaysLaterWeather)
-    setWeekWeatherArr(twoDaysWeather.concat(twoDaysLaterWeather));
-  }, [weatherState])
-  // console.log('weekTempArr', weekTempArr);
-  
   return (
     <>
       <div className="site3">
         <div className="item_box_wrap">
-          {
-            weekTempArr.map((v, i) => { // 07번째부터 AM/PM 없음
-              return (
-                <Site3_item_box key={`${i}번째 주간날씨`} data={v} idx={i} icons={weekWeatherArr} />
-              )
-            })
-          }
+          {weekTempArr.map((v, i) => {
+            // 07번째부터 AM/PM 없음
+            return (
+              <Site3_item_box
+                key={`${i}번째 주간날씨`}
+                data={v}
+                idx={i}
+                icons={weekWeatherArr}
+              />
+            );
+          })}
         </div>
       </div>
     </>
-  )
+  );
 }
+
+Site3.propTypes = {
+  data: PropTypes.object,
+  weatherState: PropTypes.object,
+  currentDate: PropTypes.string,
+};
