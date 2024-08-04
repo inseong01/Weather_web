@@ -252,17 +252,15 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes }
     for (let i = 0; i < vilageFcstMapData.length; i++) {
       if (
         +vilageFcstMapData[i]["위도(시)"] !== geolocation[0] ||
-        +vilageFcstMapData[i]["경도(시)"] !== geolocation[2] ||
         +vilageFcstMapData[i]["위도(분)"] !== geolocation[1] ||
+        +vilageFcstMapData[i]["경도(시)"] !== geolocation[2] ||
         +vilageFcstMapData[i]["경도(분)"] !== geolocation[3]
       )
         continue;
-      // console.log('vilageFcstMapData', vilageFcstMapData[i]);
       selectedLocations.push(vilageFcstMapData[i]);
     }
     setCurrentLocation(selectedLocations); // [{1단계: '경기도', 2단계: '고양시일산동구', 3단계: '중산1동', …}, ...]
-  }, [geolocation]);
-  // console.log('currentLocation', currentLocation);
+  }, [geolocation, vilageFcstMapData]);
 
   // API 데이터 추출
   useEffect(() => {

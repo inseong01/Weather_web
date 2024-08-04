@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import Site5_item_box_wrap from "./Site5_item_box_wrap"
+import Site5_item_box_wrap from "./Site5_item_box_wrap";
+import PropTypes from "prop-types";
 
 const getFilterData = (data, currentTime) => {
   let arr = [];
@@ -9,31 +9,34 @@ const getFilterData = (data, currentTime) => {
       data[i].category === "강수형태" ||
       data[i].category === "하늘상태" ||
       data[i].category === "기온"
-    ) continue;
+    )
+      continue;
     arr.push(data[i]);
   }
   return arr;
-}
-/* eslint-disable */
-export default function Site5({ data, currentTime }) { // 단기예보 = [{...}, {...} ...]
-  const [filteredData, setFilteredData] = useState([]);
+};
 
-  useEffect(() => {
-    if (!data) return;
-    let filteredDataArr = getFilterData(data, currentTime);
-    setFilteredData(filteredDataArr)
-  }, [data])
-  // console.log('setFilteredData', filteredData);
+export default function Site5({ data, currentTime }) {
+  // 단기예보 = [{...}, {...} ...]
+  const filteredDataArr = getFilterData(data, currentTime);
 
   return (
     <>
       <div className="site5">
         <div className="box_wrap">
-          {
-            filteredData.map(item => <Site5_item_box_wrap key={item.category} data={item} />)
-          }
+          {filteredDataArr.map((item) => (
+            <Site5_item_box_wrap
+              key={item.category}
+              data={item}
+            />
+          ))}
         </div>
       </div>
     </>
-  )
+  );
 }
+
+Site5.propTypes = {
+  data: PropTypes.array,
+  currentTime: PropTypes.string,
+};
