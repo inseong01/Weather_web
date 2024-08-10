@@ -24,10 +24,10 @@ function Reload({ loading, pageError, setGeoLocation }) {
   // reload
   useEffect(() => {
     if (reload === false) return;
-    setTimeout(setDefaultGeolocation, 1800, setGeoLocation);
-    setTimeout(() => {
-      setReload(false);
-    }, 6500);
+    // setTimeout(setDefaultGeolocation, 1800, setGeoLocation);
+    // setTimeout(() => {
+    //   setReload(false);
+    // }, 6500);
   }, [reload]);
 
   return (

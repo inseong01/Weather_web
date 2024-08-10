@@ -11,10 +11,10 @@ import Site3 from '../components/Site3';
 import Site4 from '../components/Site4';
 import Site5 from '../components/Site5';
 
-import GetSecond_weatherState_API from '../functions/second_weatherState_api';
+import getSecond_weatherState_API from '../functions/second_weatherState_api';
 import GetThird_temperature_API from '../functions/third_temperature_api';
-import GetSecondAPI from '../functions/second_api';
-import GetFirstAPI from '../functions/first_api';
+import getSecondAPI from '../functions/second_api';
+import getFirstAPI from '../functions/first_api';
 import GetForth_airConditionValue_API from '../functions/forth_airConditionValue_api';
 import GetXY_Position_API from '../functions/forth_xyPosition_API';
 import GetStaionName_API from '../functions/forth_stationName';
@@ -260,66 +260,94 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
   // API 데이터 추출
   useEffect(() => {
     if (!currentLocation[0]) return;
+    getFirstAPI(API_KEY, currentDate, currentTime, currentLocation[0])
+      .then((res) => {
+        const { response } = res;
+        const data = response.body.items.item;
+
+        if (response.header.resultCode !== '00') {
+          // 에러 문구 'Error Code (숫자코드), (오류내용)'
+          throw new Error(`Code ${response.header.resultCode}, ${response.header.resultMsg}`);
+        }
+        // res 결과 반환
+        data.map((value) => {
+          // 번역
+          ultraSrtFcstCategory.forEach((e) => {
+            if (e.category == value.category) {
+              return (value.category = e.value);
+            }
+          });
+        });
+        setUltraSrtFcstData(data);
+      })
+      .catch((err) => {
+        console.error('getFirstAPI', err);
+      });
+
+    getSecondAPI(
+      API_KEY,
+      currentDate,
+      currentLocation[0],
+      previousUpdateTime,
+      '',
+      currentDateMinusOne,
+      currentTime
+    ) //2
+      .then((res) => {
+        const { response } = res;
+        const data = response.body.items.item;
+
+        if (response.header.resultCode !== '00') {
+          // 에러 문구 'Error Code (숫자코드), (오류내용)'
+          throw new Error(`Code ${response.header.resultCode}, ${response.header.resultMsg}`);
+        }
+        // res 결과 반환
+        setVilageFcstDaily(data);
+      });
+    getSecond_weatherState_API(API_KEY, currentDate, currentLocation[0], currentTime, currentDateMinusOne) //3
+      .then((res) => {
+        const { response } = res;
+        const data = response.body.items.item;
+
+        if (response.header.resultCode !== '00') {
+          // 에러 문구 'Error Code (숫자코드), (오류내용)'
+          throw new Error(`Code ${response.header.resultCode}, ${response.header.resultMsg}`);
+        }
+        // res 결과 반환
+        setDailyState({
+          twoDaysLater: data,
+        });
+      });
+    GetThird_temperature_API(
+      API_KEY,
+      currentDate,
+      currentLocation[0],
+      midFcstMapData,
+      currentTime,
+      currentDateMinusOne
+    ) //4
+      .then((res) => {
+        const { response } = res;
+        const data = response.body.items.item;
+
+        if (response.header.resultCode !== '00') {
+          // 에러 문구 'Error Code (숫자코드), (오류내용)'
+          throw new Error(`Code ${response.header.resultCode}, ${response.header.resultMsg}`);
+        }
+        // res 결과 반환
+        setWeeklyData((prev) => ({
+          ...prev,
+          threeDaysLater: data,
+        }));
+      });
     try {
-      GetFirstAPI(API_KEY, currentDate, currentTime, currentLocation[0]) //1
-        .then((resolve) => {
-          // console.log('resolve', resolve)
-          let res = JSON.parse(resolve).response.body.items.item;
-          res.map((value) => {
-            // 번역
-            ultraSrtFcstCategory.forEach((e) => {
-              if (e.category == value.category) {
-                return (value.category = e.value);
-              }
-            });
-          });
-          setUltraSrtFcstData(res);
-          return;
-        });
-      GetSecondAPI(
-        API_KEY,
-        currentDate,
-        currentLocation[0],
-        previousUpdateTime,
-        '',
-        currentDateMinusOne,
-        currentTime
-      ) //2
-        .then((result) => {
-          let res = JSON.parse(result).response.body.items.item;
-          setVilageFcstDaily(res);
-          return;
-        });
-      GetSecond_weatherState_API(API_KEY, currentDate, currentLocation[0], currentTime, currentDateMinusOne) //3
-        .then((resolve) => {
-          let data = JSON.parse(resolve).response.body.items.item;
-          setDailyState({
-            twoDaysLater: data,
-          });
-          return;
-        });
-      GetThird_temperature_API(
-        API_KEY,
-        currentDate,
-        currentLocation[0],
-        midFcstMapData,
-        currentTime,
-        currentDateMinusOne
-      ) //4
-        .then((resolve) => {
-          let data = JSON.parse(resolve).response.body.items.item;
-          setWeeklyData({
-            ...weeklyData,
-            threeDaysLater: data,
-          });
-          return;
-        });
     } catch (error) {
       console.log('API', error);
       setPageError((prev) => ({ ...prev, apiError: true }));
     }
   }, [currentLocation]);
-  // console.log('airCondition', !airCondition[0].PM10)
+
+  // ----------------------- API 리팩토링 수정 분기선 -----------------------------
 
   // 데이터 분류
   useEffect(() => {

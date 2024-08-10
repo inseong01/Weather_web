@@ -20,10 +20,10 @@ function getGeoLocation(setGeoLocation) {
   };
   const error = () => {
     // 거부
-    const latitude = 42.6909130654328; // 위도
-    const longitude = 35.754305253403; // 경도
-    // const latitude = 37.6909130654328; // 위도
-    // const longitude = 126.754305253403; // 경도
+    // const latitude = 42.6909130654328; // 위도
+    // const longitude = 35.754305253403; // 경도
+    const latitude = 37.6909130654328; // 위도
+    const longitude = 126.754305253403; // 경도
     selectedOptionLocation = ['error', [latitude.toFixed(6), longitude.toFixed(6)]];
     selectedOptionLocation[1] = geolocationCalculator(selectedOptionLocation[1]); // 위경도 시분초 계산
     console.log('getGeolocationo default', selectedOptionLocation);
