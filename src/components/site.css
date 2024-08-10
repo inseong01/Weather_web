@@ -179,7 +179,7 @@
   border: 1px solid #f2f2f2;
   border-radius: 50%;
   font-size: 9px;
-  
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -214,10 +214,10 @@
 
 @media (max-width: 1200px) {
   body {
-    overflow-y: scroll;
+    overflow-y: scroll !important;
   }
   #root {
-    height: auto;
+    height: auto !important;
   }
   .msg {
     display: flex;
@@ -253,8 +253,10 @@
     font-size: 16px;
   }
 
-  .site2, .site3,
-  .site4, .site5 {
+  .site2,
+  .site3,
+  .site4,
+  .site5 {
     width: 100%;
   }
   .site2 .swiper {
@@ -267,7 +269,7 @@
     width: 30px;
     height: 30px;
   }
-  .site3 .item_box{
+  .site3 .item_box {
     font-size: 18px;
   }
   .site3 .dayInfo_wrap {
@@ -307,6 +309,12 @@
   }
   .site5 .info {
     font-size: 13px;
+  }
+}
+
+@media (max-width: 700px) {
+  .Home_wrap {
+    padding: 50px 30px 20px;
   }
 }
 
