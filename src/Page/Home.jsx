@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import './Home.css';
 import AOS from 'aos';
@@ -12,12 +12,12 @@ import Site4 from '../components/Site4';
 import Site5 from '../components/Site5';
 
 import getSecond_weatherState_API from '../functions/second_weatherState_api';
-import GetThird_temperature_API from '../functions/third_temperature_api';
+import getThird_temperature_API from '../functions/third_temperature_api';
 import getSecondAPI from '../functions/second_api';
 import getFirstAPI from '../functions/first_api';
-import GetForth_airConditionValue_API from '../functions/forth_airConditionValue_api';
-import GetXY_Position_API from '../functions/forth_xyPosition_API';
-import GetStaionName_API from '../functions/forth_stationName';
+import getForth_airConditionValue_API from '../functions/forth_airConditionValue_api';
+import getXY_Position_API from '../functions/forth_xyPosition_API';
+import getStaionName_API from '../functions/forth_stationName';
 import getSecondAPI_lowtemp from '../functions/second_api_lowTemp';
 import filteringVilageFcstDaily from '../functions/filteringVilageFcstDaily';
 import getSecondAPI_temp from '../functions/second_api_temp';
@@ -238,7 +238,7 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
 
   // 현재위치
   useEffect(() => {
-    if (!geolocation) return;
+    if (!geolocation || !vilageFcstMapData) return;
     let selectedLocations = []; // [{단기예보 엑셀 행}, {...}, ...]
     for (let i = 0; i < vilageFcstMapData.length; i++) {
       if (
@@ -265,10 +265,6 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
         const { response } = res;
         const data = response.body.items.item;
 
-        if (response.header.resultCode !== '00') {
-          // 에러 문구 'Error Code (숫자코드), (오류내용)'
-          throw new Error(`Code ${response.header.resultCode}, ${response.header.resultMsg}`);
-        }
         // res 결과 반환
         data.map((value) => {
           // 번역
@@ -297,10 +293,6 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
         const { response } = res;
         const data = response.body.items.item;
 
-        if (response.header.resultCode !== '00') {
-          // 에러 문구 'Error Code (숫자코드), (오류내용)'
-          throw new Error(`Code ${response.header.resultCode}, ${response.header.resultMsg}`);
-        }
         // res 결과 반환
         setVilageFcstDaily(data);
       });
@@ -309,16 +301,12 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
         const { response } = res;
         const data = response.body.items.item;
 
-        if (response.header.resultCode !== '00') {
-          // 에러 문구 'Error Code (숫자코드), (오류내용)'
-          throw new Error(`Code ${response.header.resultCode}, ${response.header.resultMsg}`);
-        }
         // res 결과 반환
         setDailyState({
           twoDaysLater: data,
         });
       });
-    GetThird_temperature_API(
+    getThird_temperature_API(
       API_KEY,
       currentDate,
       currentLocation[0],
@@ -330,10 +318,6 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
         const { response } = res;
         const data = response.body.items.item;
 
-        if (response.header.resultCode !== '00') {
-          // 에러 문구 'Error Code (숫자코드), (오류내용)'
-          throw new Error(`Code ${response.header.resultCode}, ${response.header.resultMsg}`);
-        }
         // res 결과 반환
         setWeeklyData((prev) => ({
           ...prev,
@@ -346,8 +330,6 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
       setPageError((prev) => ({ ...prev, apiError: true }));
     }
   }, [currentLocation]);
-
-  // ----------------------- API 리팩토링 수정 분기선 -----------------------------
 
   // 데이터 분류
   useEffect(() => {
@@ -370,21 +352,30 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
   // 공기상태
   useEffect(() => {
     if (!mainSec.local || mainSec.highTemp) return;
-    GetXY_Position_API(API_KEY, mainSec.local.replace(/[\d\d,\d.제]/g, ''))
+    getXY_Position_API(API_KEY, mainSec.local.replace(/[\d\d,\d.제]/g, ''))
       .then((res) => {
         // tmX, tmY 좌표 계산
-        let data = JSON.parse(res).response.body.items;
+        const { response } = res;
+        const data = response.body.items;
         // [{sggName: '고양시 일산서구', umdName: '덕이동', tmX: '177349.530865', tmY: '465945.611074', sidoName: '경기도'}]
-        return GetStaionName_API(API_KEY, data.flat());
-      })
-      .then((resolve) => {
-        // 측정소 검색
-        let data = JSON.parse(resolve).response.body.items;
         // 측정소가 있어도 값이 없을 수 있음 (totalCount = 0)
-        return GetForth_airConditionValue_API(API_KEY, data[0]); //5;
+
+        // res 결과 반환
+        return getStaionName_API(API_KEY, data[0]);
       })
       .then((res) => {
-        let data = JSON.parse(res).response.body.items;
+        // 측정소 검색
+        const { response } = res;
+        const data = response.body.items;
+
+        // res 결과 반환
+        return getForth_airConditionValue_API(API_KEY, data[0]); //5;
+      })
+      .then((res) => {
+        const { response } = res;
+        const data = response.body.items;
+
+        // res 결과 반환
         if (!data[0]) {
           setStationNotFound(true);
           setSiteCount((prev) => prev + 1);
@@ -392,10 +383,9 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
         }
         setAirCondition([data[0]]);
         setSiteCount((prev) => prev + 1);
-        // console.log('-------------------------', data)
       })
       .catch((e) => {
-        console.log('erroe', e);
+        console.log(e);
         setStationNotFound(true);
         setSiteCount((prev) => prev + 1);
       });
@@ -469,25 +459,28 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
     if (!mainSec.highTemp) return;
     try {
       getSecondAPI_lowtemp(API_KEY, currentDate, currentLocation[0], '', 50) //2_2
-        .then((result) => {
-          let res = JSON.parse(result).response.body.items.item;
-          setMainSec({
-            ...mainSec,
-            lowTemp: getLowTemp(res),
-          });
-        });
+        .then((res) => {
+          const data = res.response.body.items.item;
 
+          // res 결과 반환
+          setMainSec((prev) => ({
+            ...prev,
+            lowTemp: getLowTemp(data),
+          }));
+        });
       setSiteCount((prev) => prev + 1);
 
       if (currentTime < '1400') return;
       getSecondAPI_temp(API_KEY, currentDate, currentLocation[0], previousUpdateTime) //2_2
-        .then((result) => {
-          let res = JSON.parse(result).response.body.items.item;
-          let arr = filteringVilageFcstDaily(res, currentDate, currentTime);
-          setWeeklyData({
-            ...weeklyData,
+        .then((res) => {
+          const data = res.response.body.items.item;
+          const arr = filteringVilageFcstDaily(data, currentDate, currentTime);
+
+          // res 결과 반환
+          setWeeklyData((prev) => ({
+            ...prev,
             before: arr[0],
-          });
+          }));
         });
     } catch (error) {
       if (pageError) return;
@@ -507,10 +500,14 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
         <div className="Home_wrap">
           <Site1 data={mainSec} geolocationRes={geolocationRes} />
           <div className="site_wrap" data-aos="fade-up" data-aos-delay="500">
-            <Site2 temperature={timeSessionTMPData} sky={timeSessionSKYData} time={currentTime} />
-            <Site3 data={weeklyData} weatherState={dailyState} currentDate={currentDate} />
-            <Site4 data={airCondition} stationNotFound={stationNotFound} />
-            <Site5 data={ultraSrtFcstData} currentTime={currentTime} />
+            <div className="site_left_wrap">
+              <Site2 temperature={timeSessionTMPData} sky={timeSessionSKYData} time={currentTime} />
+              <Site3 data={weeklyData} weatherState={dailyState} currentDate={currentDate} />
+            </div>
+            <div className="site_right_wrap">
+              <Site4 data={airCondition} stationNotFound={stationNotFound} />
+              <Site5 data={ultraSrtFcstData} currentTime={currentTime} />
+            </div>
           </div>
         </div>
       )}

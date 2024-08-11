@@ -1,23 +1,15 @@
 function filteringVilageFcstDaily(vilageFcstDaily, currentDate, currentTime) {
-  let beforeArr = [];
-  let weatherState = [];
-  let otherDataArr = [];
+  const beforeArr = [];
+  const weatherState = [];
+  const otherDataArr = [];
   for (let i = 0; i < vilageFcstDaily.length; i++) { // 단기예보 데이터 분류
-    // console.log('vilageFcstDaily', vilageFcstDaily)
-    if (
-      currentDate == vilageFcstDaily[i].fcstDate 
-      && vilageFcstDaily[i].fcstTime < currentTime
-    ) continue;
-    if (
-      vilageFcstDaily[i].category === 'TMP' || 
-      vilageFcstDaily[i].category === 'TMX' || 
-      vilageFcstDaily[i].category === 'TMN' 
-    ) {
+    const fcstDate = vilageFcstDaily[i].fcstDate;
+    const fcstTime = vilageFcstDaily[i].fcstDate;
+
+    if (currentDate === fcstDate && fcstTime < currentTime) continue;
+    if (vilageFcstDaily[i].category.match(/TMP|TMX|TMN/)) {
       beforeArr.push(vilageFcstDaily[i]);
-    } else if (
-      vilageFcstDaily[i].category === "SKY" ||
-      vilageFcstDaily[i].category === "PTY"
-    ) {
+    } else if (vilageFcstDaily[i].category.match(/SKY|PTY/)) {
       weatherState.push(vilageFcstDaily[i]);
     } else if (vilageFcstDaily[i].category === 'REH') {
       otherDataArr.push(vilageFcstDaily[i]);

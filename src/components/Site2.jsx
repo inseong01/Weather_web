@@ -1,19 +1,24 @@
-import { Swiper, SwiperSlide } from "swiper/react";
-import Site2_item_box from "./Site2_item_box";
-import PropTypes from "prop-types";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import Site2_item_box from './Site2_item_box';
+import PropTypes from 'prop-types';
 
-import "./site.css";
-import "swiper/css";
+import './site.css';
+import 'swiper/css';
+
+// 시간 별 온도
+function getTimeArr(time, temperature, sky) {
+  const arr = [];
+  for (let i = 0; i < temperature.length; i++) {
+    if (temperature[i].fcstTime < time) continue;
+    let temp = [temperature[i], sky[i]]; // [{"TMP"}, [Array(2)]]
+    arr.push(temp);
+  }
+  return arr;
+}
 
 export default function Site2({ time, temperature, sky }) {
-  const timeStandard = time.slice(0, 2) + ":" + time.slice(2, 4);
-  const timeArr = [];
-
-  // 시간 별 온도
-  for (let i = 0; i < temperature.length; i++) {
-    let temp = [temperature[i], sky[i]]; // [{"TMP"}, [Array(2)]]
-    timeArr.push(temp);
-  }
+  const timeStandard = time.slice(0, 2) + ':' + time.slice(2, 4);
+  const timeArr = getTimeArr(time, temperature, sky);
 
   return (
     <>
@@ -38,10 +43,7 @@ export default function Site2({ time, temperature, sky }) {
             {timeArr.map((value, idx) => {
               return (
                 <SwiperSlide key={`${idx + 1}번째 슬라이드`}>
-                  <Site2_item_box
-                    data={value}
-                    time={time}
-                  />
+                  <Site2_item_box data={value} time={time} />
                 </SwiperSlide>
               );
             })}

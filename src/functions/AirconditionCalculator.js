@@ -3,7 +3,6 @@ import pm10StandardCalculator from "./pm10StandardCalculator";
 import pm25StandardCalculator from "./pm25StandardCalculator";
 
 function AirconditionCalculator(key, data) {
-  console.log('data', data)
   switch (key) {
     case "pm10Grade":
       return pm10StandardCalculator(data[`pm10Value`]);

@@ -1,4 +1,4 @@
-const GetThird_temperature_API = async (API_KEY, currentDate, currentLocation, midFcstMapData, currentTime, yesterday) => { // 1일 2회(06, 18) 중기기온예보
+const getThird_temperature_API = async (API_KEY, currentDate, currentLocation, midFcstMapData, currentTime, yesterday) => { // 1일 2회(06, 18) 중기기온예보
   let regId;
   let firstLc = currentLocation["1단계"].split(/[도특별시특별자치시광역시]/g)[0];
   let secondLc = currentLocation["2단계"].split(/[시군구특별자치시]/g)[0];
@@ -30,9 +30,15 @@ const GetThird_temperature_API = async (API_KEY, currentDate, currentLocation, m
   try {
     response = await fetch(url + queryString);
     const data = await response.json();
+    console.log(data.response.header);
+
+    if (data.response.header.resultCode !== '00') {
+      // 에러 문구 'Error Code (숫자코드), (오류내용)'
+      throw new Error(`Code ${data.response.header.resultCode}, ${data.response.header.resultMsg}`);
+    }
     return data;
   } catch (err) {
-    console.error('getSecond_weatherState_API.js', err);
+    console.error('getThird_temperature_API.js', err);
   }
 
   // ------------ 전 -------------
@@ -70,4 +76,4 @@ const GetThird_temperature_API = async (API_KEY, currentDate, currentLocation, m
   // })
 }
 
-export default GetThird_temperature_API
+export default getThird_temperature_API

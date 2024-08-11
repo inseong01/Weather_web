@@ -79,6 +79,11 @@ async function getFirstAPI(API_KEY, currentDate, currentTime, currentLocation) {
   try {
     response = await fetch(url + queryString);
     const data = await response.json();
+    console.log(data.response.header);
+    if (data.response.header.resultCode !== '00') {
+      // 에러 문구 'Error Code (숫자코드), (오류내용)'
+      throw new Error(`Code ${data.response.header.resultCode}, ${data.response.header.resultMsg}`);
+    }
     return data;
   } catch (err) {
     console.error('first_api.js', err);

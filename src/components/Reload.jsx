@@ -16,7 +16,7 @@ function Reload({ loading, pageError, setGeoLocation }) {
 
   // 응답시간
   useEffect(() => {
-    const timeOut = setTimeout(reloadPopup, 5000, setReload, loading);
+    const timeOut = setTimeout(reloadPopup, 6000, setReload, loading);
     if (loading === false) {
       clearTimeout(timeOut);
     }
@@ -24,10 +24,10 @@ function Reload({ loading, pageError, setGeoLocation }) {
   // reload
   useEffect(() => {
     if (reload === false) return;
-    // setTimeout(setDefaultGeolocation, 1800, setGeoLocation);
-    // setTimeout(() => {
-    //   setReload(false);
-    // }, 6500);
+    setTimeout(setDefaultGeolocation, 1800, setGeoLocation);
+    setTimeout(() => {
+      setReload(false);
+    }, 6500);
   }, [reload]);
 
   return (
