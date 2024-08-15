@@ -7,13 +7,16 @@ import 'swiper/css';
 
 // 시간 별 온도
 function getTimeArr(time, temperature, sky) {
-  const arr = [];
-  for (let i = 0; i < temperature.length; i++) {
-    if (temperature[i].fcstTime < time) continue;
-    let temp = [temperature[i], sky[i]]; // [{"TMP"}, [Array(2)]]
-    arr.push(temp);
+  const timeTemperatureArr = [];
+  console.log('temperature', temperature);
+  for (let i = 0; i < sky.length; i++) {
+    const TMP = temperature[i].TMP;
+    const SKY = sky[i].SKY;
+    const PTY = sky[i].PTY;
+
+    timeTemperatureArr.push({ TMP, SKY, PTY });
   }
-  return arr;
+  return timeTemperatureArr;
 }
 
 export default function Site2({ time, temperature, sky }) {
@@ -43,7 +46,7 @@ export default function Site2({ time, temperature, sky }) {
             {timeArr.map((value, idx) => {
               return (
                 <SwiperSlide key={`${idx + 1}번째 슬라이드`}>
-                  <Site2_item_box data={value} time={time} />
+                  <Site2_item_box data={value} time={time} idx={idx} />
                 </SwiperSlide>
               );
             })}

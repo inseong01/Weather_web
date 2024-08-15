@@ -1321,8 +1321,7 @@
 
 const mergeWeekData = (data, currentDate) => {
   let num = 1;
-  const weekArr = new Map;
-  // const weekArr = [];
+  const weekArr = new Map();
 
   // 최저/고온도(내일, 모레) -> taMin1 ~ 
   const threeDaysBefore = data.before.filter(item => item.fcstDate !== currentDate && item.category.match(/TMN|TMX/));
@@ -1332,9 +1331,6 @@ const mergeWeekData = (data, currentDate) => {
   data.threeDaysLater.forEach(content =>
     Object.keys(content).forEach((key) => resultArray.set(key, Number(content[key]).toFixed(0)))
   )
-  // data.threeDaysLater.map(item =>
-  //   Object.entries(item).map(([key, value]) => ({ key, value }))
-  // ).flat();
 
   threeDaysBefore.forEach(item => {
     if (item.category === 'TMN') {
@@ -1343,15 +1339,6 @@ const mergeWeekData = (data, currentDate) => {
       weekArr.set(`taMax${num}`, Number(item.fcstValue).toFixed(0));
       num++
     }
-    // if (item.category === 'TMN') {
-    //   item['key'] = `taMin${num}`;
-    //   item[`value`] = item.fcstValue;
-    // } else if (item.category === 'TMX') {
-    //   item[`key`] = `taMax${num}`;
-    //   item[`value`] = item.fcstValue;
-    //   num++
-    // }
-    // weekArr.push(item);
   })
 
   // 정렬
@@ -1374,6 +1361,5 @@ const mergeWeekData = (data, currentDate) => {
 
   return collectTemp
 }
-// collectTemp [{ taMin: undefined, taMax: '33' }, ...]
-// mergeWeekData = (data, currentDate)
+
 export default mergeWeekData;

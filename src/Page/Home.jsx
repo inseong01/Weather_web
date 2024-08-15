@@ -37,6 +37,10 @@ let currentTime = getCurrentTime();
 let currentDate = new Date().toISOString().slice(0, 10).replaceAll('-', '');
 let currentDateMinusOne;
 let previousUpdateTime;
+// index
+let idx1 = 0;
+let idx2 = 0;
+
 // API
 const API_KEY = import.meta.env.VITE_API_KEY;
 
@@ -395,9 +399,9 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
   useEffect(() => {
     if (!vilageFcstDaily || vilageFcstDaily[0].baseTime === currentTime) return;
     let arr = filteringVilageFcstDaily(vilageFcstDaily, currentDate, currentTime); // [beforeArr, weatherState, otherDataArr];
-    let beforeArr = arr[0];
-    let weatherState = arr[1];
-    let otherDataArr = arr[2];
+    let beforeArr = arr[0]; // 수
+    let weatherState = arr[1]; // 정
+    let otherDataArr = arr[2]; // 필요
 
     setWeeklyData({
       ...weeklyData,
@@ -410,19 +414,19 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
     });
 
     // timeSessionData 추출
+    // let dailyTMP = [];
     let dailyTMP = [];
     let dailyWeather = [];
+
     // 시간 별 기온
     for (let i = 0; i < beforeArr.length; i++) {
-      let item = [];
-      if (dailyTMP.length > 9) continue;
       if (beforeArr[i].category !== 'TMP') continue;
-      item = beforeArr[i];
-      dailyTMP.push(item);
+      if (beforeArr[i].fcstTime < currentTime && beforeArr[i].fcstDate === currentDate) continue;
+      dailyTMP.push({ TMP: beforeArr[i] });
     }
+
     // 시간 별 날씨
     for (let i = 0; i < weatherState.length; i += 2) {
-      let item = [];
       if (dailyWeather.length > 9) {
         // 데이터 10가지만 받음
         setTimeSessionTMPData(dailyTMP);
@@ -431,9 +435,14 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
       }
       if (weatherState[i].fcstTime === weatherState[i + 1].fcstTime) {
         // [{SKY}, {PTY}]
-        item = [weatherState[i], weatherState[i + 1]];
+        const obj = {
+          SKY: weatherState[i], // 정밀하게
+          PTY: weatherState[i + 1], // 걸러서 추출
+        };
+
+        dailyWeather.push(obj);
+        // idx2 += 1;
       }
-      dailyWeather.push(item);
     }
 
     // 일간 날씨 이틀치

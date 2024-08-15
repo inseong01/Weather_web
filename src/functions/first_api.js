@@ -44,7 +44,7 @@
 
 // 변수 더미
 // const setParam = {};
-// setParam['serviceKey'] = 'dviGmZuftX3h7VNSS2UVxZ1M7AfjXEQRTTQVoMhes28TPZETMMXENDJ%2FT60N5MkIHuZGTVGLZqYBfbZTwGUPUw%3D%3D';
+// setParam['serviceKey'] = '';
 // setParam['pageNo'] = 1
 // setParam['numOfRows'] = 1000
 // setParam['dataType'] = 'JSON'
@@ -52,6 +52,8 @@
 // setParam['base_time'] = `0600`;
 // setParam['nx'] = `60`;
 // setParam['ny'] = `127`; // 종로구
+
+// import axios from 'axios';
 
 async function getFirstAPI(API_KEY, currentDate, currentTime, currentLocation) { // 1시간 마다
   let getTime = String(currentTime - 100);
@@ -88,6 +90,20 @@ async function getFirstAPI(API_KEY, currentDate, currentTime, currentLocation) {
   } catch (err) {
     console.error('first_api.js', err);
   }
+
+  // // axios
+  // try {
+  //   const response = await axios.get(url + queryString);
+  //   const data = response.data;
+
+  //   if (data.response.header.resultCode !== '00') {
+  //     // 에러 문구 'Error Code (숫자코드), (오류내용)'
+  //     throw new Error(`Code ${data.response.header.resultCode}, ${data.response.header.resultMsg}`);
+  //   }
+  //   return data
+  // } catch (err) {
+  //   console.error('first_api.js', err);
+  // }
 }
 
 export default getFirstAPI

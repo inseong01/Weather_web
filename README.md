@@ -13,6 +13,8 @@ https://weather-web-drab.vercel.app/
 <details>
 <summary>펼치기</summary>
 
+08.15. - 코드 리팩토링: Site2 (+item_box).jsx
+
 08.11. - 코드 리팩토링: Site4~5 (+item_box, item_box_wrap).jsx
 
 08.10. - 코드 리팩토링, 오류 수정 : 등록되지 않은 지역은 기본 위치로 재검색
