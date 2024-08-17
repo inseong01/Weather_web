@@ -4,26 +4,35 @@ import mergeWeatherTwoDays from "./mergeWeatherTwoDays";
 function getWeatherArr(weatherState) {
   if (!weatherState.twoDays) return;
   // 주간 날씨 아이콘
-  let twoDaysWeather = mergeWeatherTwoDays(weatherState.twoDays);
-  let twoDaysLaterWeather = [];
-  let box = [];
-  for (let i in weatherState.twoDaysLater[0]) {
-    // [{...}]
-    if (i.includes("wf")) {
-      if (box.length > 1) {
-        twoDaysLaterWeather.push(box); // [{value}, {value}]
-        box = [];
-      }
-      let value = {
-        key: i,
-        value: getWeatherIconNameTranslator(weatherState.twoDaysLater[0][i]), // 함수적용
-        origin: weatherState.twoDaysLater[0][i],
-      };
-      box.push(value);
-    }
-  }
+  const twoDaysWeather = mergeWeatherTwoDays(weatherState.twoDays);
 
-  return twoDaysWeather.concat(twoDaysLaterWeather);
+  const twoDaysLaterWeather = [];
+  let mergeObj = {};
+
+  Object.keys(weatherState.twoDaysLater[0]).forEach((key) => {
+    if (!key.includes('wf')) return;
+
+    const dayNum = key.match(/\d+/)[0];
+    if (Object.keys(mergeObj).length > 1) {
+      mergeObj = {};
+      return;
+    }
+
+    mergeObj = {
+      [`wf${dayNum}Am`]: {
+        url: getWeatherIconNameTranslator(weatherState.twoDaysLater[0][`wf${dayNum}Am`])
+      },
+      [`wf${dayNum}Pm`]: {
+        url: getWeatherIconNameTranslator(weatherState.twoDaysLater[0][`wf${dayNum}Pm`])
+      },
+      [`regId`]: weatherState.twoDaysLater[0][`regId`],
+    };
+
+    twoDaysLaterWeather.push(mergeObj);
+  });
+
+  // 1~7일차까지 추출 
+  return twoDaysWeather.concat(twoDaysLaterWeather).splice(0, 7);
 }
 
 export default getWeatherArr;

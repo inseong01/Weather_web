@@ -8,7 +8,6 @@ import 'swiper/css';
 // 시간 별 온도
 function getTimeArr(time, temperature, sky) {
   const timeTemperatureArr = [];
-  console.log('temperature', temperature);
   for (let i = 0; i < sky.length; i++) {
     const TMP = temperature[i].TMP;
     const SKY = sky[i].SKY;

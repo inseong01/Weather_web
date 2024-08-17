@@ -13,6 +13,8 @@ https://weather-web-drab.vercel.app/
 <details>
 <summary>펼치기</summary>
 
+08.17. - 코드 리팩토링: Site3 (+item_box).jsx
+
 08.15. - 코드 리팩토링: Site2 (+item_box).jsx
 
 08.11. - 코드 리팩토링: Site4~5 (+item_box, item_box_wrap).jsx

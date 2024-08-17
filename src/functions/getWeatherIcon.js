@@ -1,9 +1,9 @@
-import inputSkyCode from "./inputSkyCode";
+import inputSkyCode from "./inputSkyCode.js";
 
 const getWeatherIconName = (skyCode, ptyCode) => {
   let name = '';
   switch (true) {
-    case ptyCode === 0 :
+    case ptyCode === 0:
       name = inputSkyCode(skyCode);
       break;
     case ptyCode === 1 || ptyCode === 4:
@@ -15,7 +15,7 @@ const getWeatherIconName = (skyCode, ptyCode) => {
     case ptyCode === 3:
       name = "snow";
       break;
-    default :
+    default:
       console.log('ptyCode error')
       return;
   }

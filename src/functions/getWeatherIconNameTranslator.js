@@ -3,15 +3,17 @@ const words = [
 ];
 
 const getWeatherIconNameTranslator = (str) => {
+  if (!str) return;
+
   let name = '';
   let code;
   words.forEach((word, idx) => {
-    if (!str.includes(word)) return;
+    if (!str?.includes(word)) return;
     code = idx;
   })
 
   switch (true) {
-    case code === 0 :
+    case code === 0:
       name = "sunny"
       break;
     case code === 1 || code === 4:
@@ -26,8 +28,8 @@ const getWeatherIconNameTranslator = (str) => {
     case code === 5:
       name = "cloudy";
       break;
-    default :
-      console.log('ptyCode error')
+    default:
+      console.log(`ptyCode error - str: ${str}`)
       return;
   }
   return `url(/img/${name}.png)`;

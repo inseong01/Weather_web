@@ -9,7 +9,7 @@ export default function Site3({ data, weatherState, currentDate }) {
   // 주간 기온 최저/최고 병합
   const weekTempArr = mergeWeekData(data, currentDate);
 
-  // ------------------ 여기부터 시작 ------------------
+  // ------------------ 여기까지 함 ------------------
   // 주간 날씨 기온/아이콘
   const weekWeatherArr = getWeatherArr(weatherState);
 
@@ -18,7 +18,7 @@ export default function Site3({ data, weatherState, currentDate }) {
       <div className="site3">
         <div className="item_box_wrap">
           {weekTempArr.map((data, i) => {
-            // 07번째부터 AM/PM 없음
+            // wf8번째부터 AM/PM 없음
             return <Site3_item_box key={`${i}번째 주간날씨`} data={data} idx={i} icons={weekWeatherArr} />;
           })}
         </div>

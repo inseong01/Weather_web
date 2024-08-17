@@ -10,15 +10,15 @@ function calculate7Days() {
 }
 
 export default function Site3_item_box({ data, idx, icons }) {
-  const [days, setDays] = useState([]);
+  const [dayArr, setDaysArr] = useState([]);
 
   useEffect(() => {
-    setDays(calculate7Days());
+    setDaysArr(calculate7Days());
   }, []);
 
-  const day = days[idx + 1];
-  const amIcon = icons[idx][0].value;
-  const pmIcon = icons[idx][1].value;
+  const day = dayArr[idx + 1];
+  const amIcon = icons[idx][`wf${idx + 1}Am`].url;
+  const pmIcon = icons[idx][`wf${idx + 1}Pm`].url;
 
   return (
     <div className="item_box">
