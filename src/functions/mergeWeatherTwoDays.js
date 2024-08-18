@@ -1,15 +1,12 @@
 import getWeatherIconName from "./getWeatherIcon.js";
 
 const mergeWeatherTwoDays = (data) => {
-  // let mergeBox = [];
   const mergeBox = [];
-  for (let i = 0; i < data.length; i += 2) {
-    // let box = [data[i], data[i + 1]];
-    // mergeBox.push(box);
 
-    const SKY = data[i]; // 검
-    const PTY = data[i + 1]; // 증
-    mergeBox.push({ SKY, PTY }); // 필 요
+  for (let i = 0; i < data.SKY.length; i++) {
+    const SKY = data.SKY[i];
+    const PTY = data.PTY[i];
+    mergeBox.push({ SKY, PTY });
   }
 
   const twoDaysArr = [];
@@ -17,10 +14,9 @@ const mergeWeatherTwoDays = (data) => {
   for (let i = 0; i < mergeBox.length; i += 2) {
     const wf = {
       [`wf${num}Am`]: {
-        // skycode는 왜 필요한 거지
         url: getWeatherIconName(
           +mergeBox[i].SKY.fcstValue,
-          +mergeBox[i].PTY.fcstValue
+          +mergeBox[i].PTY.fcstValue,
         ),
         baseDate: mergeBox[i].SKY.baseDate,
         baseTime: mergeBox[i].SKY.baseTime,
@@ -30,7 +26,7 @@ const mergeWeatherTwoDays = (data) => {
       [`wf${num}Pm`]: {
         url: getWeatherIconName(
           +mergeBox[i + 1].SKY.fcstValue,
-          +mergeBox[i + 1].PTY.fcstValue
+          +mergeBox[i + 1].PTY.fcstValue,
         ),
         baseDate: mergeBox[i + 1].SKY.baseDate,
         baseTime: mergeBox[i + 1].SKY.baseTime,

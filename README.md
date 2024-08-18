@@ -13,6 +13,8 @@ https://weather-web-drab.vercel.app/
 <details>
 <summary>펼치기</summary>
 
+08.18. - 코드 리팩토링: Home, Reload.jsx
+
 08.17. - 코드 리팩토링: Site3 (+item_box).jsx
 
 08.15. - 코드 리팩토링: Site2 (+item_box).jsx
@@ -72,6 +74,35 @@ https://weather-web-drab.vercel.app/
 <br />
 
 # 2. 느낀점
+
+## 08.18.
+
+### 배열 인덱스는 어떤 값인지 모른다
+
+- #### 코드 리팩토링
+
+  : 배열 인덱스는 어떤 값인지 한 눈에 알아볼 수 없음. 명확한 이름이 필요한 배열 인덱스 전부 객체로 수정. 배열 인덱스로 사용하면 어떤 값인지, 이게 정확한 값인지 한 눈에 들어오지 않음. 간결하고 정확한 코드를 위해 키와 값 형태로 만듦.
+
+  ```javascript
+  const weatherState = [{ sky: '흐림' }, { pty: '눈' }]; // 전
+
+  const weatherState = { sky: '흐림', pty: '눈' }; // 후
+  ```
+
+  주로 Map을 사용함으로써 `key`와 `value` 이름을 따로 만들지 않아도 편하게 할당할 수 있었음. 다만 다중 키/값을 할당할 때는 객체를 따로 선언해야 하는 점은 불편했음. 그래도 `.get` `.set`으로 객체 접근성이 좋았음.
+
+  또한 객체 `key`를 선언할 때 리터럴을 사용하려면 `[]` 대괄호를 사용하면 되는 것을 이제 알게됨.
+
+  ```javascript
+  // 1 { key: 'pm20Value', value: '20' }
+
+  // 2
+  const aircondition = new Map();
+  aircondition.set('pm20Value', 20); // { pm20Value: '20' }
+
+  // literal
+  const aircondition = { [`pm${number}`]: `pm${number}value` };
+  ```
 
 ## 08.03.
 

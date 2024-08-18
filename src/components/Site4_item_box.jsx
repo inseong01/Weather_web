@@ -31,7 +31,7 @@ const calculateAirQualityIndexCSS = (grade, value) => {
   cssValueBox = { transitionXValue: Math.floor(transitionXValue), bgColor: bgColor };
   return cssValueBox;
 };
-const getData = ([data]) => {
+const getData = (data) => {
   let returnData = {};
   let airValue = new Map();
   let airGrade = new Map();
@@ -99,5 +99,5 @@ export default function Site4_item_box({ data }) {
 }
 
 Site4_item_box.propTypes = {
-  data: PropTypes.array,
+  data: PropTypes.object,
 };

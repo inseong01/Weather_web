@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import NoneGeolocation from './NoneGeolocation';
 
-function reloadPopup(setReload, loading) {
-  if (loading === false) return;
+function reloadPopup(setReload) {
   setReload(true);
 }
 function setDefaultGeolocation(setGeoLocation) {
@@ -13,22 +12,25 @@ function setDefaultGeolocation(setGeoLocation) {
 
 function Reload({ loading, pageError, setGeoLocation }) {
   const [reload, setReload] = useState(false);
+  const timeout = useRef(null);
+
+  useEffect(() => {
+    timeout.current = setTimeout(reloadPopup, 6000, setReload, loading);
+  }, []);
 
   // 응답시간
   useEffect(() => {
-    const timeOut = setTimeout(reloadPopup, 6000, setReload, loading);
-    if (loading === false) {
-      clearTimeout(timeOut);
-    }
+    if (loading === true) return;
+    clearTimeout(timeout.current);
   }, [loading]);
   // reload
   useEffect(() => {
-    if (reload === false) return;
+    if (pageError.noneGeolocationError === false) return;
     setTimeout(setDefaultGeolocation, 1800, setGeoLocation);
     setTimeout(() => {
       setReload(false);
     }, 6500);
-  }, [reload]);
+  }, [pageError]);
 
   return (
     <>{reload ? <NoneGeolocation pageError={pageError} /> : <p className="msg">날씨 정보 가져오는 중..</p>}</>

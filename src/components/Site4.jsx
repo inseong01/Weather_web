@@ -12,8 +12,7 @@ export default function Site4({ data, stationNotFound }) {
 
   // 측정소 통신상태 확인
   useEffect(() => {
-    if (!data[0]) return;
-    checkStationError(data[0], setStationError);
+    checkStationError(data, setStationError);
   }, [data]);
 
   return (
@@ -34,6 +33,6 @@ export default function Site4({ data, stationNotFound }) {
 }
 
 Site4.propTypes = {
-  data: PropTypes.array,
+  data: PropTypes.object,
   stationNotFound: PropTypes.bool,
 };
