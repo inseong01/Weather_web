@@ -22,18 +22,17 @@ import getSecondAPI_lowtemp from '../functions/second_api_lowTemp';
 import filteringVilageFcstDaily from '../functions/filteringVilageFcstDaily';
 import getSecondAPI_temp from '../functions/second_api_temp';
 import Reload from '../components/Reload';
-sessionStorage.clear();
 
 // Date
 const getCurrentTime = () => {
   const getCurrentTime = new Date().getHours() + '00';
-  let currentTime =
+  const currentTime =
     getCurrentTime.length > 3 ? getCurrentTime : '0'.repeat(4 - getCurrentTime.length) + getCurrentTime;
   console.log(currentTime);
   return currentTime;
 };
 let currentTime = getCurrentTime();
-// let currentTime = "0000"; // 예외처리 적용 시험 데이터
+// let currentTime = '0200'; // 예외처리 적용 시험 데이터
 let currentDate = new Date().toISOString().slice(0, 10).replaceAll('-', '');
 let currentDateMinusOne;
 let previousUpdateTime;
@@ -89,12 +88,10 @@ const getLocal = (secondLc, thirdLc) => {
   let location;
   let splitedSecondLc = secondLc.split(/(?<=.*?[시군])/); // ["~시|군", "~구"]
   if (splitedSecondLc.length > 1) {
-    location = splitedSecondLc[1] + ' ' + thirdLc;
+    return (location = splitedSecondLc[1] + ' ' + thirdLc);
   } else {
-    location = secondLc + ' ' + thirdLc;
+    return (location = secondLc + ' ' + thirdLc);
   }
-  // console.log('location', location)
-  return location;
 };
 const getTemp = (data) => {
   let temperature;
@@ -151,17 +148,19 @@ const getLowTemp = (data) => {
   }
   return lowTemp;
 };
-const findPreviousUpdateTime = (arr, currentTime) => {
+const findPreviousUpdateTime = (vilageUpdateTime, currentTime) => {
   let previousTime = null;
   if (currentTime < '0200') {
-    previousTime = '2300';
+    // 00~01
+    return (previousTime = '2300');
   }
-  if (currentTime > 1400) {
+  if (currentTime >= '1400') {
+    // 14~23
     previousTime = '1100';
     return previousTime;
   }
-  for (let time of arr) {
-    // 정렬되어 있어야 함
+  for (let time of vilageUpdateTime) {
+    // 02~13
     if (time < currentTime) {
       previousTime = time;
     }
@@ -341,13 +340,13 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
       currentTime === item.fcstTime;
     });
 
-    setMainSec({
-      ...mainSec,
+    setMainSec((prev) => ({
+      ...prev,
       local: getLocal(currentLocation[0]['2단계'], currentLocation[0]['3단계']), // 위치
       temp: getTemp(ultraSrtFcstData), // 기온
       sky: getSky(ultraSrtFcstData), // 하늘
       baseData: ultraSrtFcstData[0],
-    });
+    }));
     setSiteCount((prev) => prev + 1);
   }, [ultraSrtFcstData]);
 
@@ -459,10 +458,10 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
       }
     }
 
-    setDailyState({
-      ...dailyState,
+    setDailyState((prev) => ({
+      ...prev,
       twoDays: timeSessionData.justTwoDays,
-    });
+    }));
 
     setSiteCount((prev) => prev + 1);
   }, [vilageFcstDaily]);
@@ -471,7 +470,7 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
     // 당일 최저온도 생성/11:00이후 데이터 갱신
     if (!mainSec.highTemp) return;
     try {
-      getSecondAPI_lowtemp(API_KEY, currentDate, currentLocation[0], '', 50) //2_2
+      getSecondAPI_lowtemp(API_KEY, currentDate, currentLocation[0], '', 50) // 2_1
         .then((res) => {
           const data = res.response.body.items.item;
 
@@ -480,11 +479,14 @@ function Home({ vilageFcstMapData, midFcstMapData, geolocation, geolocationRes, 
             ...prev,
             lowTemp: getLowTemp(data),
           }));
+          return true;
+        })
+        .then((res) => {
+          setSiteCount((prev) => prev + 1);
         });
-      setSiteCount((prev) => prev + 1);
 
       if (currentTime < '1400') return;
-      getSecondAPI_temp(API_KEY, currentDate, currentLocation[0], previousUpdateTime) //2_2
+      getSecondAPI_temp(API_KEY, currentDate, currentLocation[0], previousUpdateTime) // 2_2
         .then((res) => {
           const data = res.response.body.items.item;
           const filteredVilage = filteringVilageFcstDaily(data, currentDate, currentTime);

@@ -13,6 +13,8 @@ https://weather-web-drab.vercel.app/
 <details>
 <summary>펼치기</summary>
 
+08.24. - 코드 리팩토링, 오류 수정 : 새벽 시간 업데이트
+
 08.18. - 코드 리팩토링: Home, Reload.jsx
 
 08.17. - 코드 리팩토링: Site3 (+item_box).jsx
@@ -65,10 +67,8 @@ https://weather-web-drab.vercel.app/
 
 ## 개선사항
 
-- 서버로 API_KEY 올리기
-- 에러 로그 전달하기(개발자용, 서버용)
-- 새벽시간 주간날씨, 최고/저온도 나오지 않음
-- 가끔 주간날씨 나오지 않은 채로 렌더링
+- 서버: API_KEY 올리기
+- 서버: 에러 로그 전달하기(개발자용, 서버용)
 - vilageFcst_lamc_parameter_map.json 일부 지역 없음 : 야당동
 
 <br />
